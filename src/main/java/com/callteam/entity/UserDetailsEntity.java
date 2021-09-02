@@ -14,15 +14,19 @@ public class UserDetailsEntity {
     @Column(length = 50)
     private String id;
 
-    private String name;
-
     private String address;
 
     private String mobileNo;
 
+    private String district;
+
     private String city;
 
-    private String experience;
+    @Column(columnDefinition = "LONGTEXT")
+    private String aboutme;
+
+    @Column(columnDefinition = "LONGTEXT")
+    private String skills;
 
     @Column(length = 10)
     private String status;
@@ -49,14 +53,6 @@ public class UserDetailsEntity {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public String getAddress() {
         return address;
     }
@@ -79,14 +75,6 @@ public class UserDetailsEntity {
 
     public void setCity(String city) {
         this.city = city;
-    }
-
-    public String getExperience() {
-        return experience;
-    }
-
-    public void setExperience(String experience) {
-        this.experience = experience;
     }
 
     public String getStatus() {
@@ -135,5 +123,29 @@ public class UserDetailsEntity {
 
     public void setUserEntity(UserEntity userEntity) {
         this.userEntity = userEntity;
+    }
+
+    public String getDistrict() {
+        return district;
+    }
+
+    public void setDistrict(String district) {
+        this.district = district;
+    }
+
+    public String getAboutme() {
+        return aboutme;
+    }
+
+    public void setAboutme(String aboutme) {
+        this.aboutme = aboutme;
+    }
+
+    public String getSkills() {
+        return skills;
+    }
+
+    public void setSkills(String skills) {
+        this.skills = skills;
     }
 }

@@ -1,16 +1,22 @@
 package com.callteam.service.impl;
 
-import com.callteam.dto.UserDto;
+import com.callteam.dto.*;
+import com.callteam.entity.LoginEntity;
 import com.callteam.entity.UserDetailsEntity;
 import com.callteam.entity.UserEntity;
+import com.callteam.repository.LoginRepository;
 import com.callteam.repository.UserDetailsRepository;
 import com.callteam.repository.UserRepository;
 import com.callteam.service.UserService;
 import com.callteam.utill.AppConstance;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
 import java.util.UUID;
@@ -27,39 +33,140 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserDetailsRepository userDetailsRepository;
 
+    @Autowired
+    private LoginRepository loginRepository;
+
     @Override
-    public ResponseEntity<?> addUser(UserDto userDto) {
+    public ResponseEntity<?> register(UserDto userDto) {
 
 
         try {
 
-            UserEntity userEntity = new UserEntity();
-            userEntity.setId(UUID.randomUUID().toString());
-            userEntity.setCreateDate(new Date());
-            userEntity.setUserName(userDto.getUsername());
-            userEntity.setPassword(userDto.getPassword());
-            userEntity.setStatus(AppConstance.STATUS_ACTIVE);
-            userRepository.save(userEntity);
 
+            if(loginRepository.findByEmailAndStatus(userDto.getEmail(),AppConstance.STATUS_ACTIVE) != null){
+                return new ResponseEntity<>(new ResponseDto("This user already registered"), HttpStatus.INTERNAL_SERVER_ERROR);
+            }
 
-            UserDetailsEntity userDetailsEntity = new UserDetailsEntity();
-            userDetailsEntity.setUserEntity(userEntity);
-            userDetailsEntity.setAddress(userDto.getAddress());
-            userDetailsEntity.setCity(userDto.getCity());
-            userDetailsEntity.setCreateDate(new Date());
-            userDetailsEntity.setId(UUID.randomUUID().toString());
-            userDetailsEntity.setExperience(userDto.getExperience());
-            userDetailsEntity.setStatus(AppConstance.STATUS_ACTIVE);
-            userDetailsEntity.setMobileNo(userDto.getMobileNo());
-            userDetailsRepository.save(userDetailsEntity);
+            LoginEntity loginEntity = loginRepository.save(setLoginDetails(userDto));
 
-            return new ResponseEntity<>("200", HttpStatus.OK);
+            userRepository.save(setUser(userDto,loginEntity));
 
-
+            return new ResponseEntity<>(new ResponseDto("Successfully Registered"), HttpStatus.OK);
         }catch (Exception e){
-            e.printStackTrace();
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+
+            return new ResponseEntity<>(new ResponseDto(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
+    }
+
+    @Override
+    public ResponseEntity<?> login(LoginDto loginDto) {
+
+        try {
+
+            LoginEntity loginEntity = loginRepository.findByEmailAndStatus(loginDto.getEmail(), AppConstance.STATUS_ACTIVE);
+
+            if(loginEntity != null){
+
+                UserEntity userEntity = userRepository.findByLoginEntityAndStatus(loginEntity,AppConstance.STATUS_ACTIVE);
+                if(loginEntity.getPassword().equalsIgnoreCase(loginDto.getPassword())){
+                        return new ResponseEntity<>(new LoginResponseDto(userEntity.getId(),"toke"),HttpStatus.OK);
+                }
+            }
+
+            return new ResponseEntity<>(new ResponseDto("Invalid email or password"),HttpStatus.INTERNAL_SERVER_ERROR);
+        }catch (Exception e){
+            e.printStackTrace();
+            return new ResponseEntity<>(new ResponseDto(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+
+    }
+
+    @Override
+    public ResponseEntity<?> updateProfile(MultipartFile multipartFile, String userDetailsDto) {
+
+        try {
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            UserDetailsDto userDetails = objectMapper.readValue(userDetailsDto,UserDetailsDto.class);
+
+            if(multipartFile != null){
+
+            }
+
+            UserEntity userEntity = userRepository.getByIdAndStatus(userDetails.getUserId(),AppConstance.STATUS_ACTIVE);
+
+            if(userEntity == null){
+                return new ResponseEntity<>(new ResponseDto("Invalid User Details"),HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+
+            UserDetailsEntity userDetailsEntity =  userDetailsRepository.findByUserEntityAndStatus(userEntity,AppConstance.STATUS_ACTIVE);
+
+            if(userDetailsEntity == null){
+                userDetailsEntity = setUserDetails(userDetails,userEntity);
+            }else {
+                userDetailsEntity =updateUserDetails(userDetailsEntity,userDetails);
+            }
+
+            userDetailsRepository.save(userDetailsEntity);
+
+            return new ResponseEntity<>(new ResponseDto("Successfully Update"),HttpStatus.OK);
+        }catch (Exception e){
+            e.printStackTrace();
+            return new ResponseEntity<>(new ResponseDto(e.getMessage()),HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
+
+    private UserDetailsEntity setUserDetails(UserDetailsDto userDetails,UserEntity userEntity) {
+        UserDetailsEntity userDetailsEntity = new UserDetailsEntity();
+        userDetailsEntity.setDistrict(userDetails.getDeistic());
+        userDetailsEntity.setAboutme(userDetails.getAboutme());
+        userDetailsEntity.setSkills(userDetails.getSkills());
+        userDetailsEntity.setUserEntity(userEntity);
+        //userDetailsEntity.setCreateBy();
+        userDetailsEntity.setAddress(userDetails.getAddress());
+        userDetailsEntity.setCity(userDetails.getCity());
+        userDetailsEntity.setCreateDate(new Date());
+        userDetailsEntity.setId(UUID.randomUUID().toString());
+        userDetailsEntity.setStatus(AppConstance.STATUS_ACTIVE);
+        return userDetailsEntity;
+    }
+
+
+    private UserDetailsEntity updateUserDetails(UserDetailsEntity userDetailsEntity,UserDetailsDto userDetails) {
+        userDetailsEntity.setDistrict(userDetails.getDeistic());
+        userDetailsEntity.setAboutme(userDetails.getAboutme());
+        userDetailsEntity.setSkills(userDetails.getSkills());
+        //userDetailsEntity.setCreateBy();
+        userDetailsEntity.setAddress(userDetails.getAddress());
+        userDetailsEntity.setCity(userDetails.getCity());
+        userDetailsEntity.setUpdateDate(new Date());
+        return userDetailsEntity;
+    }
+
+    public UserEntity setUser(UserDto userDto, LoginEntity loginEntity) {
+        UserEntity userEntity = new UserEntity();
+        userEntity.setId(UUID.randomUUID().toString());
+        userEntity.setFullName(userDto.getFullName());
+        userEntity.setEmail(userDto.getEmail());
+        userEntity.setLoginEntity(loginEntity);
+        userEntity.setCreateBy(userDto.getEmail());
+        userEntity.setCreateDate(new Date());
+        userEntity.setStatus(AppConstance.STATUS_ACTIVE);
+
+        return userEntity;
+    }
+
+    public LoginEntity setLoginDetails(UserDto userDto){
+        LoginEntity loginEntity =  new LoginEntity();
+        loginEntity.setEmail(userDto.getEmail());
+        loginEntity.setCreateBy(userDto.getEmail());
+        loginEntity.setPassword(userDto.getPassword());
+        loginEntity.setStatus(AppConstance.STATUS_ACTIVE);
+        loginEntity.setId(UUID.randomUUID().toString());
+        loginEntity.setCreateDate(new Date());
+        return loginEntity;
     }
 }
