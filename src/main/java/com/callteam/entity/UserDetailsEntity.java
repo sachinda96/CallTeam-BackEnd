@@ -22,6 +22,8 @@ public class UserDetailsEntity {
 
     private String city;
 
+    private Date birthDay;
+
     @Column(columnDefinition = "LONGTEXT")
     private String aboutme;
 
@@ -147,5 +149,13 @@ public class UserDetailsEntity {
 
     public void setSkills(String skills) {
         this.skills = skills;
+    }
+
+    public Date getBirthDay() {
+        return birthDay;
+    }
+
+    public void setBirthDay(Date birthDay) {
+        this.birthDay = birthDay;
     }
 }

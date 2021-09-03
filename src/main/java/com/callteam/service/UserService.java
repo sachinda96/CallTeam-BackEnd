@@ -16,4 +16,6 @@ public interface UserService {
     public ResponseEntity<?> login(LoginDto loginDto);
 
     public ResponseEntity<?> updateProfile(MultipartFile multipartFile,String userDetailsDto);
+
+    public ResponseEntity<?> getProfile(String id);
 }

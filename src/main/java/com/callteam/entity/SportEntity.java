@@ -18,9 +18,16 @@ public class SportEntity {
 
     private String type;
 
+    @Column(columnDefinition = "LONGTEXT")
     private String description;
 
-    private String ageRange;
+    private Integer ageMin;
+
+    private Integer ageMax;
+
+    private Integer numberOfPlayers;
+
+    private String imagePath;
 
     @Column(length = 10)
     private String status;
@@ -71,12 +78,29 @@ public class SportEntity {
         this.description = description;
     }
 
-    public String getAgeRange() {
-        return ageRange;
+
+    public Integer getAgeMin() {
+        return ageMin;
     }
 
-    public void setAgeRange(String ageRange) {
-        this.ageRange = ageRange;
+    public void setAgeMin(Integer ageMin) {
+        this.ageMin = ageMin;
+    }
+
+    public Integer getAgeMax() {
+        return ageMax;
+    }
+
+    public void setAgeMax(Integer ageMax) {
+        this.ageMax = ageMax;
+    }
+
+    public Integer getNumberOfPlayers() {
+        return numberOfPlayers;
+    }
+
+    public void setNumberOfPlayers(Integer numberOfPlayers) {
+        this.numberOfPlayers = numberOfPlayers;
     }
 
     public String getStatus() {
@@ -125,5 +149,13 @@ public class SportEntity {
 
     public void setCategoryEntity(CategoryEntity categoryEntity) {
         this.categoryEntity = categoryEntity;
+    }
+
+    public String getImagePath() {
+        return imagePath;
+    }
+
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
     }
 }

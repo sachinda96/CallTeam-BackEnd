@@ -1,52 +1,21 @@
-package com.callteam.entity;
+package com.callteam.dto;
 
-import javax.persistence.*;
-import java.util.Date;
+import javax.persistence.Column;
 import java.util.List;
 
-/**
- * @author sachinda
- */
+public class PlayGroundDto {
 
-@Entity
-@Table(name = "PLAYGROUNDS")
-public class PlayGroundEntity {
-
-    @Id
-    @Column(length = 50)
     private String id;
-
     private String name;
-
     private String address;
-
     private String city;
-
     private String district;
-
     private String longitude;
-
     private String latitude;
-
-    private String openTIme;
-
+    private String openTime;
     private String closeTime;
-
-    @ElementCollection
     private List<String> closeDays;
-
-    @Column(length = 10)
-    private String status;
-
-    @Column(length = 50)
-    private String createBy;
-
-    private Date createDate;
-
-    @Column(length = 50)
-    private String updateBy;
-
-    private Date updateDate;
+    private List<String> sportList;
 
     public String getId() {
         return id;
@@ -104,52 +73,20 @@ public class PlayGroundEntity {
         this.latitude = latitude;
     }
 
-    public String getStatus() {
-        return status;
+    public List<String> getSportList() {
+        return sportList;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setSportList(List<String> sportList) {
+        this.sportList = sportList;
     }
 
-    public String getCreateBy() {
-        return createBy;
+    public String getOpenTime() {
+        return openTime;
     }
 
-    public void setCreateBy(String createBy) {
-        this.createBy = createBy;
-    }
-
-    public Date getCreateDate() {
-        return createDate;
-    }
-
-    public void setCreateDate(Date createDate) {
-        this.createDate = createDate;
-    }
-
-    public String getUpdateBy() {
-        return updateBy;
-    }
-
-    public void setUpdateBy(String updateBy) {
-        this.updateBy = updateBy;
-    }
-
-    public Date getUpdateDate() {
-        return updateDate;
-    }
-
-    public void setUpdateDate(Date updateDate) {
-        this.updateDate = updateDate;
-    }
-
-    public String getOpenTIme() {
-        return openTIme;
-    }
-
-    public void setOpenTIme(String openTIme) {
-        this.openTIme = openTIme;
+    public void setOpenTime(String openTime) {
+        this.openTime = openTime;
     }
 
     public String getCloseTime() {

@@ -34,4 +34,9 @@ public class UserController {
     public ResponseEntity<?> updateProfile(@RequestParam(name = "file",required = false) MultipartFile multipartFile,@RequestParam(name = "userDetailsDto") String userDetailsDto){
         return userService.updateProfile(multipartFile,userDetailsDto);
     }
+
+    @GetMapping("/getProfile/{id}")
+    public ResponseEntity<?> getProfile(@PathVariable String id){
+        return userService.getProfile(id);
+    }
 }

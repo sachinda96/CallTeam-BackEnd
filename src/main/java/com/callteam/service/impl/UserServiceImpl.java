@@ -119,6 +119,50 @@ public class UserServiceImpl implements UserService {
 
     }
 
+    @Override
+    public ResponseEntity<?> getProfile(String id) {
+
+        try {
+
+            UserEntity userEntity = userRepository.getByIdAndStatus(id,AppConstance.STATUS_ACTIVE);
+
+            if(userEntity == null){
+                return new ResponseEntity<>(new ResponseDto("Invalid User"),HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+
+            UserDetailsEntity userDetailsEntity = userDetailsRepository.findByUserEntityAndStatus(userEntity,AppConstance.STATUS_ACTIVE);
+
+
+            return new ResponseEntity<>(setUserDto(userEntity,userDetailsEntity),HttpStatus.OK);
+
+        }catch (Exception e){
+            e.printStackTrace();
+            return new ResponseEntity<>(new ResponseDto(e.getMessage()),HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
+
+    private UserDetailsDto setUserDto(UserEntity userEntity, UserDetailsEntity userDetailsEntity) {
+        UserDetailsDto userDetailsDto = new UserDetailsDto();
+
+        if(userDetailsEntity != null){
+            userDetailsDto.setAboutme(userDetailsEntity.getAboutme());
+            userDetailsDto.setAddress(userDetailsEntity.getAddress());
+            userDetailsDto.setCity(userDetailsEntity.getCity());
+            userDetailsDto.setSkills(userDetailsEntity.getSkills());
+            userDetailsDto.setBirthDay(userDetailsEntity.getBirthDay());
+            userDetailsDto.setContactNo(userDetailsEntity.getMobileNo());
+            userDetailsDto.setDeistic(userDetailsEntity.getDistrict());
+        }
+
+        userDetailsDto.setFullName(userEntity.getFullName());
+        userDetailsDto.setEmail(userEntity.getEmail());
+        userDetailsDto.setUserId(userEntity.getId());
+
+        return userDetailsDto;
+
+    }
+
     private UserDetailsEntity setUserDetails(UserDetailsDto userDetails,UserEntity userEntity) {
         UserDetailsEntity userDetailsEntity = new UserDetailsEntity();
         userDetailsEntity.setDistrict(userDetails.getDeistic());
@@ -139,7 +183,8 @@ public class UserServiceImpl implements UserService {
         userDetailsEntity.setDistrict(userDetails.getDeistic());
         userDetailsEntity.setAboutme(userDetails.getAboutme());
         userDetailsEntity.setSkills(userDetails.getSkills());
-        //userDetailsEntity.setCreateBy();
+        userDetailsEntity.setMobileNo(userDetails.getContactNo());
+        userDetailsEntity.setBirthDay(userDetails.getBirthDay());
         userDetailsEntity.setAddress(userDetails.getAddress());
         userDetailsEntity.setCity(userDetails.getCity());
         userDetailsEntity.setUpdateDate(new Date());
