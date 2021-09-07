@@ -6,4 +6,6 @@ import org.springframework.web.multipart.MultipartFile;
 public interface SportService {
 
     public ResponseEntity<?> save(MultipartFile multipartFile,String sportDto);
+
+    public ResponseEntity<?> getAll();
 }

@@ -17,6 +17,7 @@ public class UserDetailsDto {
     private String skills;
     private String aboutme;
     private String userId;
+    private String imagePath;
 
     public String getId() {
         return id;
@@ -112,5 +113,13 @@ public class UserDetailsDto {
 
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    public String getImagePath() {
+        return imagePath;
+    }
+
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
     }
 }

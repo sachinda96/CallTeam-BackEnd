@@ -22,6 +22,8 @@ public class UserDetailsEntity {
 
     private String city;
 
+    private String imagePath;
+
     private Date birthDay;
 
     @Column(columnDefinition = "LONGTEXT")
@@ -157,5 +159,13 @@ public class UserDetailsEntity {
 
     public void setBirthDay(Date birthDay) {
         this.birthDay = birthDay;
+    }
+
+    public String getImagePath() {
+        return imagePath;
+    }
+
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
     }
 }

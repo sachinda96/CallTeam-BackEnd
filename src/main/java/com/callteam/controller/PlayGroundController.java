@@ -18,4 +18,14 @@ public class PlayGroundController {
     public ResponseEntity<?> save(@RequestBody PlayGroundDto playGroundDto){
         return playGroundService.save(playGroundDto);
     }
+
+    @GetMapping
+    public ResponseEntity<?> getAllGrounds(){
+        return playGroundService.getAll();
+    }
+
+    @GetMapping("/(city)")
+    public ResponseEntity<?> getAllByCity(@PathVariable String city){
+        return playGroundService.getAllByCity(city);
+    }
 }

@@ -22,9 +22,13 @@ public class SportController {
         return sportService.save(file, sportDto);
     }
 
+    @GetMapping("/getAll")
+    public ResponseEntity<?> getAll(){
+        return sportService.getAll();
+    }
+
     @PostMapping
     public ResponseEntity<?> save(@RequestBody SportDto sportDto) throws JsonProcessingException {
-
         String sport = new ObjectMapper().writeValueAsString(sportDto);
         return sportService.save(null, sport);
     }

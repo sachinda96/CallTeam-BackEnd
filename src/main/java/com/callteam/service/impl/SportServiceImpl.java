@@ -15,7 +15,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -51,6 +53,40 @@ public class SportServiceImpl implements SportService {
             e.printStackTrace();
             return new ResponseEntity<>(new ResponseDto(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
+
+    }
+
+    @Override
+    public ResponseEntity<?> getAll() {
+
+        try {
+            List<SportEntity> sportEntityList = sportRepository.findAllByStatus(AppConstance.STATUS_ACTIVE);
+
+            List<SportDto> sportDtoList = new ArrayList<>();
+            for (SportEntity sportEntity : sportEntityList) {
+                sportDtoList.add(setSportDto(sportEntity));
+            }
+
+            return new ResponseEntity<>(sportDtoList,HttpStatus.OK);
+        }catch (Exception ex){
+            ex.printStackTrace();
+            return new ResponseEntity<>(new ResponseDto(ex.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
+
+    public SportDto setSportDto(SportEntity sportEntity){
+        SportDto sportDto = new SportDto();
+        sportDto.setAgeMax(sportEntity.getAgeMax());
+        sportDto.setId(sportEntity.getId());
+        sportDto.setAgeMin(sportEntity.getAgeMin());
+        sportDto.setDescription(sportEntity.getDescription());
+        sportDto.setName(sportEntity.getName());
+        sportDto.setType(sportEntity.getType());
+        sportDto.setNumberOfPlayers(sportEntity.getNumberOfPlayers());
+        sportDto.setImagePath(sportEntity.getImagePath());
+        sportDto.setCategoryId(sportEntity.getCategoryEntity().getId());
+        return sportDto;
 
     }
 

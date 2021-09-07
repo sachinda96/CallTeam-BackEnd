@@ -7,6 +7,7 @@ import com.callteam.entity.UserEntity;
 import com.callteam.repository.LoginRepository;
 import com.callteam.repository.UserDetailsRepository;
 import com.callteam.repository.UserRepository;
+import com.callteam.service.FileService;
 import com.callteam.service.UserService;
 import com.callteam.utill.AppConstance;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -35,6 +36,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private LoginRepository loginRepository;
+
+    @Autowired
+    private FileService fileService;
 
     @Override
     public ResponseEntity<?> register(UserDto userDto) {
@@ -91,9 +95,6 @@ public class UserServiceImpl implements UserService {
             ObjectMapper objectMapper = new ObjectMapper();
             UserDetailsDto userDetails = objectMapper.readValue(userDetailsDto,UserDetailsDto.class);
 
-            if(multipartFile != null){
-
-            }
 
             UserEntity userEntity = userRepository.getByIdAndStatus(userDetails.getUserId(),AppConstance.STATUS_ACTIVE);
 
@@ -107,6 +108,10 @@ public class UserServiceImpl implements UserService {
                 userDetailsEntity = setUserDetails(userDetails,userEntity);
             }else {
                 userDetailsEntity =updateUserDetails(userDetailsEntity,userDetails);
+            }
+
+            if(multipartFile != null){
+                userDetailsEntity.setImagePath(fileService.uploadFile(userEntity.getId(),multipartFile));
             }
 
             userDetailsRepository.save(userDetailsEntity);
@@ -153,6 +158,7 @@ public class UserServiceImpl implements UserService {
             userDetailsDto.setBirthDay(userDetailsEntity.getBirthDay());
             userDetailsDto.setContactNo(userDetailsEntity.getMobileNo());
             userDetailsDto.setDeistic(userDetailsEntity.getDistrict());
+            userDetailsDto.setImagePath(userDetailsEntity.getImagePath());
         }
 
         userDetailsDto.setFullName(userEntity.getFullName());

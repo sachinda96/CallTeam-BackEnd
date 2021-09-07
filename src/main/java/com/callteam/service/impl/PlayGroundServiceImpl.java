@@ -16,7 +16,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -56,6 +58,65 @@ public class PlayGroundServiceImpl implements PlayGroundService {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
+    }
+
+    @Override
+    public ResponseEntity<?> getAll() {
+
+        try {
+
+            List<PlayGroundEntity> playGroundEntityList = playGroundRepository.findAllByStatus(AppConstance.STATUS_ACTIVE);
+
+            List<PlayGroundDto> playGroundDtoList = new ArrayList<>();
+
+            for (PlayGroundEntity playGroundEntity : playGroundEntityList) {
+                playGroundDtoList.add(setPlayGround(playGroundEntity));
+            }
+
+            return new ResponseEntity<>(playGroundDtoList,HttpStatus.OK);
+        }catch (Exception e){
+            e.printStackTrace();
+            return new ResponseEntity<>(new ResponseDto(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+
+    }
+
+    @Override
+    public ResponseEntity<?> getAllByCity(String city) {
+
+        try {
+
+            List<PlayGroundEntity> playGroundEntityList = playGroundRepository.findAllByStatusAndCity(AppConstance.STATUS_ACTIVE,city);
+
+            List<PlayGroundDto> playGroundDtoList = new ArrayList<>();
+
+            for (PlayGroundEntity playGroundEntity : playGroundEntityList) {
+                playGroundDtoList.add(setPlayGround(playGroundEntity));
+            }
+
+            return new ResponseEntity<>(playGroundDtoList,HttpStatus.OK);
+        }catch (Exception e){
+            e.printStackTrace();
+            return new ResponseEntity<>(new ResponseDto(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+
+    }
+
+    private PlayGroundDto setPlayGround(PlayGroundEntity playGroundEntity) {
+        PlayGroundDto playGroundDto = new PlayGroundDto();
+        playGroundDto.setAddress(playGroundEntity.getAddress());
+        playGroundDto.setId(playGroundEntity.getId());
+        playGroundDto.setOpenTime(playGroundEntity.getOpenTIme());
+        playGroundDto.setLongitude(playGroundEntity.getLongitude());
+        playGroundDto.setLatitude(playGroundEntity.getLatitude());
+        playGroundDto.setDistrict(playGroundEntity.getDistrict());
+        playGroundDto.setCloseTime(playGroundEntity.getCloseTime());
+        playGroundDto.setCloseDays(playGroundDto.getCloseDays());
+        playGroundDto.setCity(playGroundDto.getCity());
+        playGroundDto.setName(playGroundDto.getName());
+        return playGroundDto;
     }
 
     private PlayGroundSportEntity setPlaygroundSportEntity(SportEntity sportEntity, PlayGroundEntity playGroundEntity) {

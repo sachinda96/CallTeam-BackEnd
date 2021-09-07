@@ -6,4 +6,8 @@ import org.springframework.http.ResponseEntity;
 public interface PlayGroundService {
 
     public ResponseEntity<?> save(PlayGroundDto playGroundDto);
+
+    public ResponseEntity<?> getAll();
+
+    public ResponseEntity<?> getAllByCity(String city);
 }
