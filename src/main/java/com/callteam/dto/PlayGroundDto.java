@@ -14,6 +14,7 @@ public class PlayGroundDto {
     private String latitude;
     private String openTime;
     private String closeTime;
+    private String imagePath;
     private List<String> closeDays;
     private List<String> sportList;
 
@@ -103,5 +104,13 @@ public class PlayGroundDto {
 
     public void setCloseDays(List<String> closeDays) {
         this.closeDays = closeDays;
+    }
+
+    public String getImagePath() {
+        return imagePath;
+    }
+
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
     }
 }

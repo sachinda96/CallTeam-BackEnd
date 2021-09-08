@@ -6,6 +6,7 @@ import com.callteam.entity.CategoryEntity;
 import com.callteam.entity.SportEntity;
 import com.callteam.repository.CategoryRepository;
 import com.callteam.repository.SportRepository;
+import com.callteam.service.FileService;
 import com.callteam.service.SportService;
 import com.callteam.utill.AppConstance;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -30,6 +31,9 @@ public class SportServiceImpl implements SportService {
     @Autowired
     private SportRepository sportRepository;
 
+    @Autowired
+    private FileService fileService;
+
 
     @Override
     public ResponseEntity<?> save(MultipartFile multipartFile, String sportDto) {
@@ -37,6 +41,11 @@ public class SportServiceImpl implements SportService {
         try {
 
             SportDto sport = new ObjectMapper().readValue(sportDto,SportDto.class);
+
+            sport.setId(UUID.randomUUID().toString());
+            if(multipartFile != null){
+                sport.setImagePath(fileService.uploadFile(sport.getId(),multipartFile));
+            }
 
             CategoryEntity categoryEntity =  categoryRepository.getByIdAndStatus(sport.getCategoryId(), AppConstance.STATUS_ACTIVE);
 
@@ -100,7 +109,7 @@ public class SportServiceImpl implements SportService {
         sportEntity.setCategoryEntity(categoryEntity);
         sportEntity.setCreateDate(new Date());
         sportEntity.setDescription(sportDto.getDescription());
-        sportEntity.setId(UUID.randomUUID().toString());
+        sportEntity.setId(sportDto.getId());
         sportEntity.setName(sportDto.getName());
         sportEntity.setStatus(AppConstance.STATUS_ACTIVE);
         return sportEntity;

@@ -10,4 +10,6 @@ public interface PlayGroundRepository extends JpaRepository<PlayGroundEntity,Str
     List<PlayGroundEntity> findAllByStatus(String statusActive);
 
     List<PlayGroundEntity> findAllByStatusAndCity(String statusActive, String city);
+
+    PlayGroundEntity getByIdAndStatus(String groundId, String statusActive);
 }

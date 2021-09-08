@@ -3,12 +3,9 @@ package com.callteam.entity;
 import javax.persistence.*;
 import java.util.Date;
 
-/**
- * @author sachinda
- */
 @Entity
-@Table(name = "SPORTPOOLDETAILS")
-public class SportPoolDetailsEntity {
+@Table(name = "USERSPORT")
+public class UserSportEntity {
 
     @Id
     @Column(length = 50)
@@ -27,15 +24,13 @@ public class SportPoolDetailsEntity {
 
     private Date updateDate;
 
-    private String team;
+    @ManyToOne
+    @JoinColumn(name = "userdetailsId")
+    private UserDetailsEntity userDetailsEntity;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
-    private UserEntity userEntity;
-
-    @ManyToOne
-    @JoinColumn(name = "sportpool_id")
-    private SportPoolEntity sportPoolEntity;
+    @JoinColumn(name = "sportId")
+    private SportEntity sportEntity;
 
     public String getId() {
         return id;
@@ -85,27 +80,19 @@ public class SportPoolDetailsEntity {
         this.updateDate = updateDate;
     }
 
-    public UserEntity getUserEntity() {
-        return userEntity;
+    public UserDetailsEntity getUserDetailsEntity() {
+        return userDetailsEntity;
     }
 
-    public void setUserEntity(UserEntity userEntity) {
-        this.userEntity = userEntity;
+    public void setUserDetailsEntity(UserDetailsEntity userDetailsEntity) {
+        this.userDetailsEntity = userDetailsEntity;
     }
 
-    public SportPoolEntity getSportPoolEntity() {
-        return sportPoolEntity;
+    public SportEntity getSportEntity() {
+        return sportEntity;
     }
 
-    public void setSportPoolEntity(SportPoolEntity sportPoolEntity) {
-        this.sportPoolEntity = sportPoolEntity;
-    }
-
-    public String getTeam() {
-        return team;
-    }
-
-    public void setTeam(String team) {
-        this.team = team;
+    public void setSportEntity(SportEntity sportEntity) {
+        this.sportEntity = sportEntity;
     }
 }

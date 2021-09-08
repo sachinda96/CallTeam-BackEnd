@@ -9,12 +9,15 @@ import com.callteam.repository.PlayGroundRepository;
 import com.callteam.repository.PlayGroundSportRepository;
 import com.callteam.repository.SportRepository;
 import com.callteam.security.JwtTokenProvider;
+import com.callteam.service.FileService;
 import com.callteam.service.PlayGroundService;
 import com.callteam.utill.AppConstance;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -36,10 +39,21 @@ public class PlayGroundServiceImpl implements PlayGroundService {
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
 
+    @Autowired
+    private FileService fileService;
+
     @Override
-    public ResponseEntity<?> save(PlayGroundDto playGroundDto) {
+    public ResponseEntity<?> save(MultipartFile multipartFile, String playGround) {
 
         try {
+
+            PlayGroundDto playGroundDto = new ObjectMapper().readValue(playGround,PlayGroundDto.class);
+
+            playGroundDto.setId(UUID.randomUUID().toString());
+
+            if(multipartFile != null){
+                fileService.uploadFile(playGroundDto.getId() ,multipartFile);
+            }
 
             PlayGroundEntity playGroundEntity = playGroundRepository.save(setPlaygroundEntity(playGroundDto));
 
@@ -109,6 +123,7 @@ public class PlayGroundServiceImpl implements PlayGroundService {
         playGroundDto.setAddress(playGroundEntity.getAddress());
         playGroundDto.setId(playGroundEntity.getId());
         playGroundDto.setOpenTime(playGroundEntity.getOpenTIme());
+        playGroundDto.setName(playGroundEntity.getName());
         playGroundDto.setLongitude(playGroundEntity.getLongitude());
         playGroundDto.setLatitude(playGroundEntity.getLatitude());
         playGroundDto.setDistrict(playGroundEntity.getDistrict());
@@ -116,6 +131,7 @@ public class PlayGroundServiceImpl implements PlayGroundService {
         playGroundDto.setCloseDays(playGroundDto.getCloseDays());
         playGroundDto.setCity(playGroundDto.getCity());
         playGroundDto.setName(playGroundDto.getName());
+        playGroundDto.setImagePath(playGroundEntity.getImagePath());
         return playGroundDto;
     }
 
@@ -136,7 +152,7 @@ public class PlayGroundServiceImpl implements PlayGroundService {
         playGroundEntity.setAddress(playGroundDto.getAddress());
         playGroundEntity.setCity(playGroundDto.getCity());
         playGroundEntity.setDistrict(playGroundDto.getDistrict());
-        playGroundEntity.setId(UUID.randomUUID().toString());
+        playGroundEntity.setId(playGroundDto.getId());
         playGroundEntity.setLatitude(playGroundDto.getLatitude());
         playGroundEntity.setCreateDate(new Date());
         playGroundEntity.setLongitude(playGroundDto.getLongitude());
@@ -145,6 +161,7 @@ public class PlayGroundServiceImpl implements PlayGroundService {
         playGroundEntity.setOpenTIme(playGroundDto.getOpenTime());
         playGroundEntity.setCloseTime(playGroundDto.getCloseTime());
         playGroundEntity.setStatus(AppConstance.STATUS_ACTIVE);
+        playGroundEntity.setImagePath(playGroundDto.getImagePath());
         return playGroundEntity;
     }
 }

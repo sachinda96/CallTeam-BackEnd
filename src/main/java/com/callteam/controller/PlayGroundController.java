@@ -1,10 +1,10 @@
 package com.callteam.controller;
 
-import com.callteam.dto.PlayGroundDto;
 import com.callteam.service.PlayGroundService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @CrossOrigin
@@ -14,9 +14,9 @@ public class PlayGroundController {
     @Autowired
     private PlayGroundService playGroundService;
 
-    @PostMapping
-    public ResponseEntity<?> save(@RequestBody PlayGroundDto playGroundDto){
-        return playGroundService.save(playGroundDto);
+    @PostMapping("/save")
+    public ResponseEntity<?> save(@RequestParam(required = false,name = "file") MultipartFile multipartFile , @RequestParam(name = "playGround") String playGround){
+        return playGroundService.save(multipartFile,playGround);
     }
 
     @GetMapping
@@ -24,7 +24,7 @@ public class PlayGroundController {
         return playGroundService.getAll();
     }
 
-    @GetMapping("/(city)")
+    @GetMapping("/getAllByCity/{city}")
     public ResponseEntity<?> getAllByCity(@PathVariable String city){
         return playGroundService.getAllByCity(city);
     }

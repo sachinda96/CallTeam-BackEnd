@@ -14,7 +14,23 @@ public class SportPoolEntity {
     @Column(length = 50)
     private String id;
 
+    private String poolId;
+
     private Date startDate;
+
+    private String name;
+
+    private String description;
+
+    private String district;
+
+    private String city;
+
+    private String startTime;
+
+    private String endTime;
+
+    private Integer noOfPlayers;
 
     @Column(length = 10)
     private String status;
@@ -34,8 +50,12 @@ public class SportPoolEntity {
     private SportEntity sportEntity;
 
     @ManyToOne
-    @JoinColumn(name = "booking_id")
-    private BookingEntity bookingEntity;
+    @JoinColumn(name = "payment_id")
+    private PaymentEntity paymentEntity;
+
+    @ManyToOne
+    @JoinColumn(name = "playground_id")
+    private PlayGroundEntity playGroundEntity;
 
     public String getId() {
         return id;
@@ -101,11 +121,83 @@ public class SportPoolEntity {
         this.sportEntity = sportEntity;
     }
 
-    public BookingEntity getBookingEntity() {
-        return bookingEntity;
+    public PaymentEntity getPaymentEntity() {
+        return paymentEntity;
     }
 
-    public void setBookingEntity(BookingEntity bookingEntity) {
-        this.bookingEntity = bookingEntity;
+    public void setPaymentEntity(PaymentEntity paymentEntity) {
+        this.paymentEntity = paymentEntity;
+    }
+
+    public PlayGroundEntity getPlayGroundEntity() {
+        return playGroundEntity;
+    }
+
+    public void setPlayGroundEntity(PlayGroundEntity playGroundEntity) {
+        this.playGroundEntity = playGroundEntity;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getDistrict() {
+        return district;
+    }
+
+    public void setDistrict(String district) {
+        this.district = district;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(String startTime) {
+        this.startTime = startTime;
+    }
+
+    public String getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(String endTime) {
+        this.endTime = endTime;
+    }
+
+    public Integer getNoOfPlayers() {
+        return noOfPlayers;
+    }
+
+    public void setNoOfPlayers(Integer noOfPlayers) {
+        this.noOfPlayers = noOfPlayers;
+    }
+
+    public String getPoolId() {
+        return poolId;
+    }
+
+    public void setPoolId(String poolId) {
+        this.poolId = poolId;
     }
 }

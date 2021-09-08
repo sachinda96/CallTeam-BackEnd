@@ -1,25 +1,22 @@
 package com.callteam.service.impl;
 
 import com.callteam.dto.*;
-import com.callteam.entity.LoginEntity;
-import com.callteam.entity.UserDetailsEntity;
-import com.callteam.entity.UserEntity;
-import com.callteam.repository.LoginRepository;
-import com.callteam.repository.UserDetailsRepository;
-import com.callteam.repository.UserRepository;
+import com.callteam.entity.*;
+import com.callteam.repository.*;
+import com.callteam.security.JwtTokenProvider;
 import com.callteam.service.FileService;
 import com.callteam.service.UserService;
 import com.callteam.utill.AppConstance;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -39,6 +36,15 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private FileService fileService;
+
+    @Autowired
+    private UserSportRepository userSportRepository;
+
+    @Autowired
+    private SportRepository sportRepository;
+
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
 
     @Override
     public ResponseEntity<?> register(UserDto userDto) {
@@ -108,19 +114,49 @@ public class UserServiceImpl implements UserService {
                 userDetailsEntity = setUserDetails(userDetails,userEntity);
             }else {
                 userDetailsEntity =updateUserDetails(userDetailsEntity,userDetails);
+
+                List<UserSportEntity> userSportEntities = userSportRepository.findAllByUserDetailsEntityAndStatus(userDetailsEntity,AppConstance.STATUS_ACTIVE);
+
+                for (UserSportEntity userSportEntity : userSportEntities) {
+                    userSportEntity.setStatus(AppConstance.STATUS_INACTIVE);
+                    userDetailsRepository.save(userDetailsEntity);
+                }
             }
 
             if(multipartFile != null){
                 userDetailsEntity.setImagePath(fileService.uploadFile(userEntity.getId(),multipartFile));
             }
 
-            userDetailsRepository.save(userDetailsEntity);
+            userDetailsEntity = userDetailsRepository.save(userDetailsEntity);
+
+
+            for (String id : userDetails.getSportList()) {
+                SportEntity sportEntity = sportRepository.getById(id);
+
+                if(sportEntity != null){
+                    userSportRepository.save(setUserSport(userDetailsEntity,sportEntity));
+                }
+            }
 
             return new ResponseEntity<>(new ResponseDto("Successfully Update"),HttpStatus.OK);
+
         }catch (Exception e){
             e.printStackTrace();
             return new ResponseEntity<>(new ResponseDto(e.getMessage()),HttpStatus.INTERNAL_SERVER_ERROR);
         }
+
+    }
+
+    private UserSportEntity setUserSport(UserDetailsEntity userDetailsEntity, SportEntity sportEntity) {
+        UserSportEntity userSportEntity = new UserSportEntity();
+        userSportEntity.setSportEntity(sportEntity);
+        userSportEntity.setId(UUID.randomUUID().toString());
+        userSportEntity.setStatus(AppConstance.STATUS_ACTIVE);
+        userSportEntity.setCreateDate(new Date());
+        userSportEntity.setUserDetailsEntity(userDetailsEntity);
+        userSportEntity.setCreateDate(new Date());
+        userSportEntity.setCreateBy(jwtTokenProvider.getUser());
+        return userSportEntity;
 
     }
 
@@ -159,6 +195,7 @@ public class UserServiceImpl implements UserService {
             userDetailsDto.setContactNo(userDetailsEntity.getMobileNo());
             userDetailsDto.setDeistic(userDetailsEntity.getDistrict());
             userDetailsDto.setImagePath(userDetailsEntity.getImagePath());
+            userDetailsDto.setSportList(setUserSportList(userDetailsEntity));
         }
 
         userDetailsDto.setFullName(userEntity.getFullName());
@@ -167,6 +204,18 @@ public class UserServiceImpl implements UserService {
 
         return userDetailsDto;
 
+    }
+
+    private List<String> setUserSportList(UserDetailsEntity userDetailsEntity) {
+
+        List<UserSportEntity> userSportEntities = userSportRepository.findAllByUserDetailsEntityAndStatus(userDetailsEntity,AppConstance.STATUS_ACTIVE);
+
+        List<String> sportList = new ArrayList<>();
+        for (UserSportEntity userSportEntity : userSportEntities) {
+            sportList.add(userSportEntity.getSportEntity().getId());
+        }
+
+        return sportList;
     }
 
     private UserDetailsEntity setUserDetails(UserDetailsDto userDetails,UserEntity userEntity) {

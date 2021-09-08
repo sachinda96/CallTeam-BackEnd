@@ -1,6 +1,6 @@
 package com.callteam.service;
 
-import com.callteam.dto.PoolDto;
+import com.callteam.dto.SportPoolReservationDto;
 import com.callteam.dto.UserDetailsDto;
 import com.callteam.dto.UserPoolDto;
 import org.springframework.http.ResponseEntity;
@@ -15,5 +15,7 @@ public interface SportPoolService {
 
     public ResponseEntity<?> getPoolDetails(String id);
 
+    public ResponseEntity<?> saveSportPool(SportPoolReservationDto sportPoolReservationDto);
 
+    public ResponseEntity<?> getAllSportPoolByUser(String userId);
 }

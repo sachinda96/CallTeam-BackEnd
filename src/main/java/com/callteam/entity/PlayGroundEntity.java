@@ -32,6 +32,8 @@ public class PlayGroundEntity {
 
     private String closeTime;
 
+    private String imagePath;
+
     @ElementCollection
     private List<String> closeDays;
 
@@ -166,5 +168,13 @@ public class PlayGroundEntity {
 
     public void setCloseDays(List<String> closeDays) {
         this.closeDays = closeDays;
+    }
+
+    public String getImagePath() {
+        return imagePath;
+    }
+
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
     }
 }

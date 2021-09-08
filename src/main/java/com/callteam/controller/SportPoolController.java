@@ -1,6 +1,7 @@
 package com.callteam.controller;
 
 import com.callteam.dto.PoolDto;
+import com.callteam.dto.SportPoolReservationDto;
 import com.callteam.dto.UserDetailsDto;
 import com.callteam.dto.UserPoolDto;
 import com.callteam.service.SportPoolService;
@@ -34,5 +35,10 @@ public class SportPoolController {
     @GetMapping("/getPoolDetails/{id}")
     public ResponseEntity<?> getPoolDetails(@PathVariable String id){
         return sportPoolService.getPoolDetails(id);
+    }
+
+    @PostMapping("/savepool")
+    public ResponseEntity<?> saveSportPool(@RequestBody SportPoolReservationDto sportPoolReservationDto){
+        return sportPoolService.saveSportPool(sportPoolReservationDto);
     }
 }
