@@ -196,6 +196,7 @@ public class UserServiceImpl implements UserService {
             userDetailsDto.setDeistic(userDetailsEntity.getDistrict());
             userDetailsDto.setImagePath(userDetailsEntity.getImagePath());
             userDetailsDto.setSportList(setUserSportList(userDetailsEntity));
+
         }
 
         userDetailsDto.setFullName(userEntity.getFullName());

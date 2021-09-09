@@ -14,11 +14,23 @@ public class TournamentEntity {
     @Column(length = 50)
     private String id;
 
-    private Date date;
+    private String name;
 
-    private Date time;
+    private String description;
 
-    private String details;
+    private Date startDate;
+
+    private String city;
+
+    private String district;
+
+    private String startTime;
+
+    private String endTime;
+
+    private Integer noOfPlayers;
+
+    private Integer noOfTeam;
 
     @Column(length = 10)
     private String status;
@@ -37,6 +49,14 @@ public class TournamentEntity {
     @JoinColumn(name = "sport_id")
     private SportEntity sportEntity;
 
+    @ManyToOne
+    @JoinColumn(name = "ground_id")
+    private PlayGroundEntity playGroundEntity;
+
+    @ManyToOne
+    @JoinColumn(name = "payment_id")
+    private PaymentEntity paymentEntity;
+
     public String getId() {
         return id;
     }
@@ -45,28 +65,76 @@ public class TournamentEntity {
         this.id = id;
     }
 
-    public Date getDate() {
-        return date;
+    public String getName() {
+        return name;
     }
 
-    public void setDate(Date date) {
-        this.date = date;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public Date getTime() {
-        return time;
+    public String getDescription() {
+        return description;
     }
 
-    public void setTime(Date time) {
-        this.time = time;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public String getDetails() {
-        return details;
+    public Date getStartDate() {
+        return startDate;
     }
 
-    public void setDetails(String details) {
-        this.details = details;
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getDistrict() {
+        return district;
+    }
+
+    public void setDistrict(String district) {
+        this.district = district;
+    }
+
+    public String getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(String startTime) {
+        this.startTime = startTime;
+    }
+
+    public String getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(String endTime) {
+        this.endTime = endTime;
+    }
+
+    public Integer getNoOfPlayers() {
+        return noOfPlayers;
+    }
+
+    public void setNoOfPlayers(Integer noOfPlayers) {
+        this.noOfPlayers = noOfPlayers;
+    }
+
+    public Integer getNoOfTeam() {
+        return noOfTeam;
+    }
+
+    public void setNoOfTeam(Integer noOfTeam) {
+        this.noOfTeam = noOfTeam;
     }
 
     public String getStatus() {
@@ -115,5 +183,21 @@ public class TournamentEntity {
 
     public void setSportEntity(SportEntity sportEntity) {
         this.sportEntity = sportEntity;
+    }
+
+    public PlayGroundEntity getPlayGroundEntity() {
+        return playGroundEntity;
+    }
+
+    public void setPlayGroundEntity(PlayGroundEntity playGroundEntity) {
+        this.playGroundEntity = playGroundEntity;
+    }
+
+    public PaymentEntity getPaymentEntity() {
+        return paymentEntity;
+    }
+
+    public void setPaymentEntity(PaymentEntity paymentEntity) {
+        this.paymentEntity = paymentEntity;
     }
 }

@@ -28,7 +28,7 @@ public class SportPoolReservation {
            for (int x= 1; x <= poolDto.getNoOfPlayers(); x++){
                TeamUserDto teamUserDto = new TeamUserDto();
                if(x == 1 && i == 1){
-                   teamUserDto.setUserId(userDetailsDto.getId());
+                   teamUserDto.setUserId(userDetailsDto.getUserId());
                    teamUserDto.setImagePath(userDetailsDto.getImagePath());
                    teamUserDto.setName(userDetailsDto.getFullName().split(" ",2)[0]);
                }else {
@@ -68,18 +68,18 @@ public class SportPoolReservation {
                .filter(x -> x.id.equals(teamId))
                .findFirst();
 
-       int i = poolDto.getTeamDtoList().indexOf(teamDto);
-
+       int i = poolDto.getTeamDtoList().indexOf(teamDto.get());
        if(teamDto.isPresent()){
 
+           index = index-1;
            TeamUserDto teamUserDto = teamDto.get().getTeamUserDtoList().get(index);
 
-
            if(teamDto.get().getTeamUserDtoList().get(index).getUserId() == null){
-               teamUserDto.setUserId(userDetailsDto.getId());
+               teamUserDto.setUserId(userDetailsDto.getUserId());
                teamUserDto.setImagePath(userDetailsDto.getImagePath());
                teamUserDto.setName(userDetailsDto.getFullName().split(" ",0).toString());
-               teamDto.get().getTeamUserDtoList().add(index,teamUserDto);
+               //teamDto.get().getTeamUserDtoList().add(index,teamUserDto);
+
            }else {
                throw new Exception("Already user joined");
            }
@@ -88,8 +88,7 @@ public class SportPoolReservation {
            return false;
        }
 
-
-       poolDto.getTeamDtoList().add(i,teamDto.get());
+       //poolDto.getTeamDtoList().add(i,teamDto.get());
        sportPool.put(poolId,poolDto);
 
        return true;
@@ -103,18 +102,21 @@ public class SportPoolReservation {
        Integer index = null;
         for (TeamDto teamDto : poolDto.getTeamDtoList()) {
             for (TeamUserDto teamUserDto : teamDto.getTeamUserDtoList()) {
-                if(teamUserDto.getUserId().equalsIgnoreCase(userDetailsDto.getId())){
-                    isJoined = true;
-                    teamId = teamDto.id;
-                    index = teamUserDto.getIndex();
-                    break;
+                if(teamUserDto.getUserId() != null){
+                    if(teamUserDto.getUserId().equalsIgnoreCase(userDetailsDto.getUserId())){
+                        isJoined = true;
+                        teamId = teamDto.id;
+                        index = teamUserDto.getIndex();
+                        break;
+                    }
                 }
+
             }
 
         }
 
         if(isJoined){
-            dropTeam(poolId,teamId,index,userDetailsDto.getId());
+            dropTeam(poolId,teamId,index,userDetailsDto.getUserId());
         }
 
         return true;
@@ -133,16 +135,16 @@ public class SportPoolReservation {
                .filter(x -> x.id.equals(teamId))
                .findFirst();
 
-       int i = poolDto.getTeamDtoList().indexOf(teamDto);
+       int i = poolDto.getTeamDtoList().indexOf(teamDto.get());
 
        if(teamDto.isPresent()){
+           index = index - 1;
 
            TeamUserDto teamUserDto = teamDto.get().getTeamUserDtoList().get(index);
            if(teamDto.get().getTeamUserDtoList().get(index).getUserId().equals(userId)){
                teamUserDto.setUserId(null);
-               teamUserDto.setImagePath(null);
+               teamUserDto.setImagePath(AppConstance.TEMP_IMAGE);
                teamUserDto.setName(null);
-               teamDto.get().getTeamUserDtoList().add(index,teamUserDto);
            }
 
        }else {
@@ -150,7 +152,7 @@ public class SportPoolReservation {
        }
 
 
-       poolDto.getTeamDtoList().add(i,teamDto.get());
+       //poolDto.getTeamDtoList().add(i,teamDto.get());
        sportPool.put(poolId,poolDto);
 
        return true;

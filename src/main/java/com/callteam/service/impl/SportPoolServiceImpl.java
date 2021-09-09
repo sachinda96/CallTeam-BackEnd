@@ -12,8 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.UUID;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @Service
 public class SportPoolServiceImpl implements SportPoolService {
@@ -41,6 +41,12 @@ public class SportPoolServiceImpl implements SportPoolService {
 
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
+
+    @Autowired
+    private UserDetailsRepository userDetailsRepository;
+
+    @Autowired
+    private UserSportRepository userSportRepository;
 
     @Override
     public ResponseEntity<?> createPool(UserPoolDto userPoolDto) {
@@ -151,14 +157,132 @@ public class SportPoolServiceImpl implements SportPoolService {
 
         try {
 
+            UserEntity userEntity = userRepository.getByIdAndStatus(userId,AppConstance.STATUS_ACTIVE);
 
-            return null;
+            if(userEntity == null){
+                return new ResponseEntity<>(new ResponseDto("Invalid User"),HttpStatus.INTERNAL_SERVER_ERROR);
+            }
 
+            List<SportEntity> sportEntityList = new ArrayList<>();
+
+            UserDetailsEntity userDetailsEntity = userDetailsRepository.findByUserEntityAndStatus(userEntity,AppConstance.STATUS_ACTIVE);
+
+            if(userDetailsEntity != null){
+                List<UserSportEntity> userSportEntityList = userSportRepository.findAllByUserDetailsEntityAndStatus(userDetailsEntity,AppConstance.STATUS_ACTIVE);
+
+                for (UserSportEntity userSportEntity:userSportEntityList) {
+                    sportEntityList.add(userSportEntity.getSportEntity());
+                }
+
+            }
+
+            List<SportPoolEntity> sportPoolEntities = sportPoolRepository.findAllBySportEntityInAndCityAndStatus(sportEntityList,userDetailsEntity.getCity(),AppConstance.STATUS_ACTIVE);
+
+            List<ProgressMatchDto> progressMatchDtoList = new ArrayList<>();
+
+            for (SportPoolEntity sportPoolEntity : sportPoolEntities) {
+
+                ProgressMatchDto progressMatchDto = new ProgressMatchDto();
+                progressMatchDto.setDate(sportPoolEntity.getStartDate());
+                progressMatchDto.setGroundCity(sportPoolEntity.getPlayGroundEntity().getCity());
+                progressMatchDto.setGroundName(sportPoolEntity.getPlayGroundEntity().getName());
+                progressMatchDto.setId(sportPoolEntity.getId());
+                progressMatchDto.setName(sportPoolEntity.getName());
+
+                ReservationPoolDto reservationPoolDto = sportPoolReservation.getPoolDetails(sportPoolEntity.getPoolId());
+
+                TeamDto teamOneDto = reservationPoolDto.getTeamDtoList().get(0);
+                TeamDto teamTwoDto = reservationPoolDto.getTeamDtoList().get(1);
+
+                progressMatchDto.setTeamOneName(teamOneDto.getTeamName());
+                progressMatchDto.setTeamTwoName(teamTwoDto.getTeamName());
+                progressMatchDto.setTeamOneId(teamOneDto.id);
+                progressMatchDto.setTeamTwoCount(teamTwoDto.id);
+                progressMatchDto.setMonth(setMonth(sportPoolEntity.getStartDate()));
+                progressMatchDto.setDay(setDate(sportPoolEntity.getStartDate()));
+                progressMatchDtoList.add(progressMatchDto);
+            }
+
+            return new ResponseEntity<>(progressMatchDtoList,HttpStatus.OK);
 
         }catch (Exception e){
             e.printStackTrace();
             return new ResponseEntity<>(new ResponseDto(e.getMessage()),HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @Override
+    public ResponseEntity<?> getSportPool(String id) {
+
+        try {
+
+            SportPoolEntity sportPoolEntity = sportPoolRepository.getByIdAndStatus(id,AppConstance.STATUS_ACTIVE);
+
+            if(sportPoolEntity == null){
+                return new ResponseEntity<>(new ResponseDto("Invalid Pool"),HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+
+            SportPoolDto sportPoolDto = new SportPoolDto();
+            sportPoolDto.setId(sportPoolEntity.getId());
+            sportPoolDto.setSportDto(setSportPoolDto(sportPoolEntity.getSportEntity()));
+            sportPoolDto.setPlayGroundDto(setPlayGroundDto(sportPoolEntity.getPlayGroundEntity()));
+            sportPoolDto.setPoolId(sportPoolEntity.getPoolId());
+            sportPoolDto.setPoolDto(setPoolDto(sportPoolEntity));
+
+            return new ResponseEntity<>(sportPoolDto,HttpStatus.OK);
+        }catch (Exception e){
+            e.printStackTrace();
+            return new ResponseEntity<>(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    private PoolDto setPoolDto(SportPoolEntity sportPoolEntity) {
+        PoolDto poolDto = new PoolDto();
+        poolDto.setCity(sportPoolEntity.getCity());
+        poolDto.setStartTime(sportPoolEntity.getStartTime());
+        poolDto.setNoOfPlayers(sportPoolEntity.getNoOfPlayers());
+        poolDto.setEndTime(sportPoolEntity.getEndTime());
+        poolDto.setDistrict(sportPoolEntity.getDistrict());
+        poolDto.setDescription(sportPoolEntity.getDescription());
+        poolDto.setDate(sportPoolEntity.getStartDate());
+        poolDto.setCity(sportPoolEntity.getCity());
+        poolDto.setName(sportPoolEntity.getName());
+        poolDto.setId(sportPoolEntity.getId());
+        return poolDto;
+    }
+
+    private PlayGroundDto setPlayGroundDto(PlayGroundEntity playGroundEntity) {
+        PlayGroundDto playGroundDto = new PlayGroundDto();
+        playGroundDto.setName(playGroundEntity.getName());
+        playGroundDto.setImagePath(playGroundEntity.getImagePath());
+        playGroundDto.setAddress(playGroundEntity.getAddress());
+        playGroundDto.setCity(playGroundEntity.getCity());
+        playGroundDto.setId(playGroundEntity.getId());
+        playGroundDto.setDistrict(playGroundEntity.getDistrict());
+        return playGroundDto;
+    }
+
+    private SportDto setSportPoolDto(SportEntity sportEntity) {
+        SportDto sportDto = new SportDto();
+        sportDto.setImagePath(sportEntity.getImagePath());
+        sportDto.setName(sportEntity.getName());
+        sportDto.setId(sportEntity.getId());
+        sportDto.setCategoryId(sportEntity.getCategoryEntity().getId());
+        sportDto.setDescription(sportEntity.getDescription());
+        sportDto.setNumberOfPlayers(sportEntity.getNumberOfPlayers());
+        sportDto.setAgeMin(sportEntity.getAgeMin());
+        sportDto.setAgeMax(sportEntity.getAgeMax());
+        return sportDto;
+    }
+
+    private String setMonth(Date startDate) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MMM");
+        return simpleDateFormat.format(startDate).toUpperCase();
+    }
+    private String setDate(Date startDate){
+        Calendar date = new GregorianCalendar();
+        date.setTime(startDate);
+        return String.valueOf(date.get(Calendar.DAY_OF_MONTH));
     }
 
     private SportPoolDetailsEntity setSportPoolDetailsEntity(SportPoolEntity sportPoolEntity, UserEntity userEntity) {
