@@ -4,6 +4,7 @@ import java.util.Date;
 
 public class TournamentDto {
 
+    private String poolId;
     private String tournamentName;
     private String tournamentDescription;
     private Date startDate;
@@ -16,6 +17,14 @@ public class TournamentDto {
     private String sportId;
     private String groundId;
     private PaymentDto paymentDto;
+
+    public String getPoolId() {
+        return poolId;
+    }
+
+    public void setPoolId(String poolId) {
+        this.poolId = poolId;
+    }
 
     public String getTournamentName() {
         return tournamentName;

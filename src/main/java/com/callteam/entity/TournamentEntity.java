@@ -32,6 +32,8 @@ public class TournamentEntity {
 
     private Integer noOfTeam;
 
+    private String poolId;
+
     @Column(length = 10)
     private String status;
 
@@ -199,5 +201,13 @@ public class TournamentEntity {
 
     public void setPaymentEntity(PaymentEntity paymentEntity) {
         this.paymentEntity = paymentEntity;
+    }
+
+    public String getPoolId() {
+        return poolId;
+    }
+
+    public void setPoolId(String poolId) {
+        this.poolId = poolId;
     }
 }

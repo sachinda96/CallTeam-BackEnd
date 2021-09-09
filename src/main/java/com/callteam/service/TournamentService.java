@@ -7,4 +7,6 @@ public interface TournamentService {
 
     public ResponseEntity<?> save(TournamentDto tournamentDto);
 
+    public ResponseEntity<?> getTournamentsByUserCity(String id);
+
 }

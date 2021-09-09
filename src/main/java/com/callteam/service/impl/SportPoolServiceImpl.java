@@ -53,7 +53,7 @@ public class SportPoolServiceImpl implements SportPoolService {
 
         try {
 
-            String id = sportPoolReservation.newSportPool(userPoolDto.getUserDetailsDto(),userPoolDto.getPoolDto(), AppConstance.MATCH_NOT);
+            String id = sportPoolReservation.newSportPool(userPoolDto.getUserDetailsDto(),userPoolDto.getPoolDto(), userPoolDto.getPoolDto().getNoOfTeam());
 
             if(id == null){
                 return new ResponseEntity<>(new ResponseDto("Failed to create pool"),HttpStatus.INTERNAL_SERVER_ERROR);

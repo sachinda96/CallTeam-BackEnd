@@ -20,4 +20,9 @@ public class TournamentController {
         return tournamentService.save(tournamentDto);
     }
 
+    @GetMapping("/tournamentsByUserCity/{id}")
+    public ResponseEntity<?> getTournamentsByUserCity(@PathVariable String id){
+        return tournamentService.getTournamentsByUserCity(id);
+    }
+
 }

@@ -17,7 +17,9 @@ public class PoolDto {
     private String endTime;
     private SportDto sport;
     private Integer noOfPlayers;
+    private Integer noOfTeam = 2;
     private List<TeamDto> teamDtoList = new ArrayList<>();
+
 
 
     public String getId() {
@@ -114,5 +116,13 @@ public class PoolDto {
 
     public void setTeamDtoList(List<TeamDto> teamDtoList) {
         this.teamDtoList = teamDtoList;
+    }
+
+    public Integer getNoOfTeam() {
+        return noOfTeam;
+    }
+
+    public void setNoOfTeam(Integer noOfTeam) {
+        this.noOfTeam = noOfTeam;
     }
 }
