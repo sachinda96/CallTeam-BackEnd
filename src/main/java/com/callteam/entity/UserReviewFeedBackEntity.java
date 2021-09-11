@@ -7,12 +7,16 @@ import java.util.Date;
  * @author sachinda
  */
 @Entity
-@Table(name = "USERREVIEWFEEDBACK")
+@Table(name = "REVIEWFEEDBACK")
 public class UserReviewFeedBackEntity {
 
     @Id
     @Column(length = 50)
     private String id;
+
+    private String review;
+
+    private Integer rate;
 
     @Column(length = 10)
     private String status;
@@ -27,17 +31,13 @@ public class UserReviewFeedBackEntity {
 
     private Date updateDate;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "feedback_id")
-    private ReviewFeedBackEntity reviewFeedBackEntity;
+    @ManyToOne
+    @JoinColumn(name = "review_user_id")
+    private UserEntity reviewUser;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "recive_userdetails_id")
-    private UserDetailsEntity userDetailsEntity;
-
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_id")
-    private UserEntity userEntity;
+    @ManyToOne
+    @JoinColumn(name = "receive_user_id")
+    private UserEntity receiveUser;
 
     public String getId() {
         return id;
@@ -45,6 +45,22 @@ public class UserReviewFeedBackEntity {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getReview() {
+        return review;
+    }
+
+    public void setReview(String review) {
+        this.review = review;
+    }
+
+    public Integer getRate() {
+        return rate;
+    }
+
+    public void setRate(Integer rate) {
+        this.rate = rate;
     }
 
     public String getStatus() {
@@ -87,27 +103,19 @@ public class UserReviewFeedBackEntity {
         this.updateDate = updateDate;
     }
 
-    public ReviewFeedBackEntity getReviewFeedBackEntity() {
-        return reviewFeedBackEntity;
+    public UserEntity getReviewUser() {
+        return reviewUser;
     }
 
-    public void setReviewFeedBackEntity(ReviewFeedBackEntity reviewFeedBackEntity) {
-        this.reviewFeedBackEntity = reviewFeedBackEntity;
+    public void setReviewUser(UserEntity reviewUser) {
+        this.reviewUser = reviewUser;
     }
 
-    public UserDetailsEntity getUserDetailsEntity() {
-        return userDetailsEntity;
+    public UserEntity getReceiveUser() {
+        return receiveUser;
     }
 
-    public void setUserDetailsEntity(UserDetailsEntity userDetailsEntity) {
-        this.userDetailsEntity = userDetailsEntity;
-    }
-
-    public UserEntity getUserEntity() {
-        return userEntity;
-    }
-
-    public void setUserEntity(UserEntity userEntity) {
-        this.userEntity = userEntity;
+    public void setReceiveUser(UserEntity receiveUser) {
+        this.receiveUser = receiveUser;
     }
 }

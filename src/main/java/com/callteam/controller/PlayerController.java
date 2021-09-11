@@ -3,10 +3,7 @@ package com.callteam.controller;
 import com.callteam.service.PlayerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @CrossOrigin
@@ -19,5 +16,10 @@ public class PlayerController {
     @GetMapping("/getAll")
     public ResponseEntity<?> getAllPlayers(){
         return playerService.getAllPlayers();
+    }
+
+    @GetMapping("/getPlayersById/{id}")
+    public ResponseEntity<?> getPlayersById(@PathVariable String id){
+        return playerService.getPlayersById(id);
     }
 }
