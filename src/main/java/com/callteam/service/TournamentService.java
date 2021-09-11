@@ -9,4 +9,6 @@ public interface TournamentService {
 
     public ResponseEntity<?> getTournamentsByUserCity(String id);
 
+    public ResponseEntity<?> getTournament(String id);
+
 }

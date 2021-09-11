@@ -24,8 +24,23 @@ public class PlayGroundController {
         return playGroundService.getAll();
     }
 
+    @GetMapping("/getById/{id}")
+    public ResponseEntity<?> getById(@PathVariable String id){
+        return playGroundService.getById(id);
+    }
+
+    @GetMapping("/{index}")
+    public ResponseEntity<?> getAllGroundsByIndex(@PathVariable int index){
+        return playGroundService.getAllByPage(index);
+    }
+
     @GetMapping("/getAllByCity/{city}")
     public ResponseEntity<?> getAllByCity(@PathVariable String city){
         return playGroundService.getAllByCity(city);
+    }
+
+    @GetMapping("/pageCount")
+    public ResponseEntity<?> pagesCount(){
+        return playGroundService.pagesCount();
     }
 }

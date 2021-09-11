@@ -7,6 +7,7 @@ public class PlayGroundDto {
 
     private String id;
     private String name;
+    private String description;
     private String address;
     private String city;
     private String district;
@@ -15,8 +16,10 @@ public class PlayGroundDto {
     private String openTime;
     private String closeTime;
     private String imagePath;
+    private String status;
     private List<String> closeDays;
     private List<String> sportList;
+    private List<PlayGroundSportDto> playGroundSportDtoList;
 
     public String getId() {
         return id;
@@ -112,5 +115,29 @@ public class PlayGroundDto {
 
     public void setImagePath(String imagePath) {
         this.imagePath = imagePath;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public List<PlayGroundSportDto> getPlayGroundSportDtoList() {
+        return playGroundSportDtoList;
+    }
+
+    public void setPlayGroundSportDtoList(List<PlayGroundSportDto> playGroundSportDtoList) {
+        this.playGroundSportDtoList = playGroundSportDtoList;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

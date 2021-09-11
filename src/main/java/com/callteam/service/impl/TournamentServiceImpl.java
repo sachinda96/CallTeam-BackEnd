@@ -115,14 +115,9 @@ public class TournamentServiceImpl implements TournamentService {
                     tournamentPoolDto.setName(tournamentEntity.getName());
                     tournamentPoolDto.setSport(tournamentEntity.getSportEntity().getName());
                     tournamentPoolDto.setNoOfTeam(tournamentEntity.getNoOfTeam());
+                    tournamentPoolDto.setId(tournamentEntity.getId());
                     tournamentPoolDtoList.add(tournamentPoolDto);
 
-
-//                    TournamentDetailsDto tournamentDetailsDto = new TournamentDetailsDto();
-//                    tournamentDetailsDto.setTournamentDto(setTournamentDto(tournamentEntity));
-//                    tournamentDetailsDto.setSportDto(setSportDto(tournamentEntity.getSportEntity()));
-//                    tournamentDetailsDto.setId(tournamentEntity.getId());
-//                    tournamentDetailsDto.setPlayGroundDto(setPlayGround(tournamentEntity.getPlayGroundEntity()));
                 }
 
             }
@@ -134,6 +129,30 @@ public class TournamentServiceImpl implements TournamentService {
             e.printStackTrace();
             return new ResponseEntity<>(new ResponseDto(e.getMessage()),HttpStatus.INTERNAL_SERVER_ERROR);
         }
+
+    }
+
+    @Override
+    public ResponseEntity<?> getTournament(String id) {
+
+        try {
+
+            TournamentEntity tournamentEntity = tournamentRepository.getByIdAndStatus(id,AppConstance.STATUS_ACTIVE);
+
+
+            TournamentDetailsDto tournamentDetailsDto = new TournamentDetailsDto();
+            tournamentDetailsDto.setTournamentDto(setTournamentDto(tournamentEntity));
+            tournamentDetailsDto.setSportDto(setSportDto(tournamentEntity.getSportEntity()));
+            tournamentDetailsDto.setId(tournamentEntity.getId());
+            tournamentDetailsDto.setPlayGroundDto(setPlayGround(tournamentEntity.getPlayGroundEntity()));
+
+            return new ResponseEntity<>(tournamentDetailsDto,HttpStatus.OK);
+
+        }catch (Exception e){
+            e.printStackTrace();
+            return new ResponseEntity<>(new ResponseDto(e.getMessage()),HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
 
     }
 
@@ -153,6 +172,7 @@ public class TournamentServiceImpl implements TournamentService {
         sportDto.setDescription(sportEntity.getDescription());
         sportDto.setImagePath(sportEntity.getImagePath());
         sportDto.setId(sportDto.getId());
+        sportDto.setName(sportEntity.getName());
         return sportDto;
     }
 

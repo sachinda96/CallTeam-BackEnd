@@ -1,6 +1,7 @@
 package com.callteam.service.impl;
 
 import com.callteam.dto.PlayGroundDto;
+import com.callteam.dto.PlayGroundSportDto;
 import com.callteam.dto.ResponseDto;
 import com.callteam.entity.PlayGroundEntity;
 import com.callteam.entity.PlayGroundSportEntity;
@@ -14,15 +15,15 @@ import com.callteam.service.PlayGroundService;
 import com.callteam.utill.AppConstance;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @Service
 public class PlayGroundServiceImpl implements PlayGroundService {
@@ -97,6 +98,27 @@ public class PlayGroundServiceImpl implements PlayGroundService {
     }
 
     @Override
+    public ResponseEntity<?> getById(String id) {
+
+        try {
+
+            PlayGroundEntity playGroundEntity = playGroundRepository.getByIdAndStatus(id,AppConstance.STATUS_ACTIVE);
+
+            if(playGroundEntity == null){
+                return new ResponseEntity<>(new ResponseDto("Invalid PlayGround"),HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+
+            return new ResponseEntity<>(setPlayGround(playGroundEntity),HttpStatus.OK);
+
+        }catch (Exception e){
+            e.printStackTrace();
+            return new ResponseEntity<>(new ResponseDto(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+
+    }
+
+    @Override
     public ResponseEntity<?> getAllByCity(String city) {
 
         try {
@@ -118,6 +140,61 @@ public class PlayGroundServiceImpl implements PlayGroundService {
 
     }
 
+    @Override
+    public ResponseEntity pagesCount() {
+
+        try {
+
+            List<Integer> pageCount= new ArrayList<>();
+
+            long count = playGroundRepository.count();
+
+            if(count <= AppConstance.PAGE_GROUND_DATA_COUNT){
+                pageCount.add(1);
+            }else {
+                if(count % AppConstance.PAGE_GROUND_DATA_COUNT != 0){
+                    count = count / AppConstance.PAGE_GROUND_DATA_COUNT + 1;
+
+                }else{
+                    count = count / AppConstance.PAGE_GROUND_DATA_COUNT;
+                }
+
+                for (int x = 0; x <= count;x++){
+                    pageCount.add(x+1);
+                }
+            }
+
+            return new ResponseEntity(pageCount,HttpStatus.OK);
+        }catch (Exception e){
+            e.printStackTrace();
+            return new ResponseEntity<>(new ResponseDto(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+
+    }
+
+    @Override
+    public ResponseEntity<?> getAllByPage(int index) {
+
+        try {
+
+            Pageable paging = PageRequest.of(index, AppConstance.PAGE_GROUND_DATA_COUNT);
+            List<PlayGroundEntity> playGroundEntityList = playGroundRepository.findAllByStatus(AppConstance.STATUS_ACTIVE);
+
+            List<PlayGroundDto> playGroundDtoList = new ArrayList<>();
+
+            for (PlayGroundEntity playGroundEntity : playGroundEntityList) {
+                playGroundDtoList.add(setPlayGround(playGroundEntity));
+            }
+
+            return new ResponseEntity<>(playGroundDtoList,HttpStatus.OK);
+        }catch (Exception e){
+            e.printStackTrace();
+            return new ResponseEntity<>(new ResponseDto(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
+
     private PlayGroundDto setPlayGround(PlayGroundEntity playGroundEntity) {
         PlayGroundDto playGroundDto = new PlayGroundDto();
         playGroundDto.setAddress(playGroundEntity.getAddress());
@@ -132,7 +209,75 @@ public class PlayGroundServiceImpl implements PlayGroundService {
         playGroundDto.setCity(playGroundDto.getCity());
         playGroundDto.setName(playGroundDto.getName());
         playGroundDto.setImagePath(playGroundEntity.getImagePath());
+        playGroundDto.setDescription(playGroundEntity.getDescription());
+        playGroundDto.setCity(playGroundEntity.getCity());
+        playGroundDto.setStatus(validateOpenClose(playGroundEntity));
+
+        List<PlayGroundSportEntity> playGroundSportEntities = playGroundSportRepository.findAllByPlayGroundEntityAndStatus(playGroundEntity,AppConstance.STATUS_ACTIVE);
+
+        List<PlayGroundSportDto> playGroundSportDtoList = new ArrayList<>();
+
+        for (PlayGroundSportEntity playGroundSportEntity : playGroundSportEntities) {
+            playGroundSportDtoList.add(setPlayGroundSportDto(playGroundSportEntity));
+        }
+
+        playGroundDto.setPlayGroundSportDtoList(playGroundSportDtoList);
+
         return playGroundDto;
+    }
+
+    private String validateOpenClose(PlayGroundEntity playGroundEntity) {
+
+        try {
+
+            String status = "OPEN";
+            Calendar cal = Calendar.getInstance();
+            int day = cal.get(Calendar.DAY_OF_WEEK);
+
+            if(!playGroundEntity.getCloseDays().isEmpty()){
+                if(playGroundEntity.getCloseDays().contains(getDate(day))){
+                    status = "CLOSED";
+                }
+            }
+
+            Calendar calendarNow = Calendar.getInstance();
+            calendarNow.setTime(new Date());
+
+            Date openTime = new SimpleDateFormat("HH:mm").parse(playGroundEntity.getOpenTIme());
+            Calendar calendarOpen = Calendar.getInstance();
+            calendarOpen.setTime(openTime);
+
+
+
+            Date closeTime = new SimpleDateFormat("HH:mm").parse(playGroundEntity.getCloseTime());
+            Calendar calendarClose = Calendar.getInstance();
+            calendarClose.setTime(closeTime);
+
+            if (openTime.after(new Date()) && calendarNow.before(calendarClose.getTime())) {
+                status = "CLOSED";
+            }
+
+
+
+            return status;
+
+        }catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+
+
+
+    }
+
+    private PlayGroundSportDto setPlayGroundSportDto(PlayGroundSportEntity playGroundSportEntity) {
+        PlayGroundSportDto playGroundSportDto = new PlayGroundSportDto();
+        playGroundSportDto.setSport(playGroundSportEntity.getSportEntity().getName());
+        playGroundSportDto.setSportId(playGroundSportEntity.getSportEntity().getId());
+        playGroundSportDto.setNoOfTeams(playGroundSportEntity.getNoOfTeams());
+        playGroundSportDto.setId(playGroundSportEntity.getId());
+        playGroundSportDto.setPricePerHour(playGroundSportEntity.getPricePerHour());
+        return playGroundSportDto;
     }
 
     private PlayGroundSportEntity setPlaygroundSportEntity(SportEntity sportEntity, PlayGroundEntity playGroundEntity) {
@@ -163,5 +308,25 @@ public class PlayGroundServiceImpl implements PlayGroundService {
         playGroundEntity.setStatus(AppConstance.STATUS_ACTIVE);
         playGroundEntity.setImagePath(playGroundDto.getImagePath());
         return playGroundEntity;
+    }
+
+    private String getDate(int day){
+        switch (day) {
+            case 1:
+                return "Sunday";
+            case 2:
+                return "Monday";
+            case 3:
+                return "Tuesday";
+            case 4:
+                return "Wednesday";
+            case 5:
+                return "Thursday";
+            case 6:
+                return "Friday";
+            case 7:
+                return "Saturday";
+        }
+        return null;
     }
 }

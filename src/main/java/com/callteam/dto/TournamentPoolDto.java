@@ -7,9 +7,9 @@ public class TournamentPoolDto {
     private String description;
     private Integer noOfTeam;
     private String sport;
-    private String Month;
+    private String month;
     private String date;
-    private String GroundName;
+    private String groundName;
     private String city;
 
     public String getId() {
@@ -52,14 +52,6 @@ public class TournamentPoolDto {
         this.sport = sport;
     }
 
-    public String getMonth() {
-        return Month;
-    }
-
-    public void setMonth(String month) {
-        Month = month;
-    }
-
     public String getDate() {
         return date;
     }
@@ -68,19 +60,27 @@ public class TournamentPoolDto {
         this.date = date;
     }
 
-    public String getGroundName() {
-        return GroundName;
-    }
-
-    public void setGroundName(String groundName) {
-        GroundName = groundName;
-    }
-
     public String getCity() {
         return city;
     }
 
     public void setCity(String city) {
         this.city = city;
+    }
+
+    public String getMonth() {
+        return month;
+    }
+
+    public void setMonth(String month) {
+        this.month = month;
+    }
+
+    public String getGroundName() {
+        return groundName;
+    }
+
+    public void setGroundName(String groundName) {
+        this.groundName = groundName;
     }
 }

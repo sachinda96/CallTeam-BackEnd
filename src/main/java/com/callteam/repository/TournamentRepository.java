@@ -9,4 +9,6 @@ import java.util.List;
 public interface TournamentRepository extends JpaRepository<TournamentEntity,String> {
 
     List<TournamentEntity> findAllBySportEntityInAndCityAndStatus(List<SportEntity> sportEntityList, String city, String statusActive);
+
+    TournamentEntity getByIdAndStatus(String id, String statusActive);
 }

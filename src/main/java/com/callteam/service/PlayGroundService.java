@@ -10,5 +10,11 @@ public interface PlayGroundService {
 
     public ResponseEntity<?> getAll();
 
+    public ResponseEntity<?> getById(String id);
+
     public ResponseEntity<?> getAllByCity(String city);
+
+    public ResponseEntity pagesCount();
+
+    public ResponseEntity<?> getAllByPage(int index);
 }

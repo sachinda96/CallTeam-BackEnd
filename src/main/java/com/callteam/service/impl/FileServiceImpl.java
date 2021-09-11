@@ -1,5 +1,6 @@
 package com.callteam.service.impl;
 
+import com.callteam.dto.PoolDto;
 import com.callteam.service.FileService;
 import com.callteam.utill.CloudConfig;
 import com.google.cloud.storage.BlobId;
@@ -17,6 +18,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class FileServiceImpl implements FileService {
@@ -29,6 +32,8 @@ public class FileServiceImpl implements FileService {
 
     @Value("${filepath}")
     private String filepath;
+
+    private Map<String, byte[]> imageList = new HashMap<>();
 
     @Override
     public String uploadFile(String id, MultipartFile multipartFile)throws Exception {
@@ -59,8 +64,14 @@ public class FileServiceImpl implements FileService {
             StorageOptions options = cloudConfig.configStorage();
 
             Storage storage = options.getService();
+            byte[] read =null;
 
-            byte[] read = storage.readAllBytes(BlobId.of(bucketName, filePath));
+            if(imageList.get(filePath) == null){
+                 read = storage.readAllBytes(BlobId.of(bucketName, filePath));
+                 imageList.put(filePath,read);
+            }else{
+                read = imageList.get(filePath);
+            }
 
             InputStreamResource resource = new InputStreamResource(new ByteArrayInputStream(read));
             return ResponseEntity.ok()

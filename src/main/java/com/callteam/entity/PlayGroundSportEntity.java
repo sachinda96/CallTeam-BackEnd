@@ -23,6 +23,11 @@ public class PlayGroundSportEntity {
 
     private Date updateDate;
 
+    private Integer noOfTeams;
+
+    private Double pricePerHour;
+
+
     @ManyToOne
     @JoinColumn(name = "sport_id")
     private SportEntity sportEntity;
@@ -93,5 +98,21 @@ public class PlayGroundSportEntity {
 
     public void setPlayGroundEntity(PlayGroundEntity playGroundEntity) {
         this.playGroundEntity = playGroundEntity;
+    }
+
+    public Integer getNoOfTeams() {
+        return noOfTeams;
+    }
+
+    public void setNoOfTeams(Integer noOfTeams) {
+        this.noOfTeams = noOfTeams;
+    }
+
+    public Double getPricePerHour() {
+        return pricePerHour;
+    }
+
+    public void setPricePerHour(Double pricePerHour) {
+        this.pricePerHour = pricePerHour;
     }
 }

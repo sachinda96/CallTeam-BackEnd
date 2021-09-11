@@ -18,6 +18,9 @@ public class PlayGroundEntity {
 
     private String name;
 
+    @Column(columnDefinition = "LONGTEXT")
+    private String description;
+
     private String address;
 
     private String city;
@@ -64,6 +67,14 @@ public class PlayGroundEntity {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public String getAddress() {
