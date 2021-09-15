@@ -22,6 +22,16 @@ public class SportController {
         return sportService.save(file, sportDto);
     }
 
+    @PostMapping("/update")
+    public ResponseEntity<?> update(@RequestParam(name = "file",required = false) MultipartFile file,@RequestParam(name = "sport",required = true) String sportDto){
+        return sportService.update(file, sportDto);
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<?> delete(@PathVariable String id){
+        return sportService.delete(id);
+    }
+
     @GetMapping("/getAll")
     public ResponseEntity<?> getAll(){
         return sportService.getAll();

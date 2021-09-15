@@ -197,7 +197,9 @@ public class SportPoolServiceImpl implements SportPoolService {
                 progressMatchDto.setTeamOneName(teamOneDto.getTeamName());
                 progressMatchDto.setTeamTwoName(teamTwoDto.getTeamName());
                 progressMatchDto.setTeamOneId(teamOneDto.id);
-                progressMatchDto.setTeamTwoCount(teamTwoDto.id);
+                progressMatchDto.setTeamTwoId(teamTwoDto.id);
+                progressMatchDto.setTeamTwoCount(setTeamCount(teamTwoDto.getTeamUserDtoList()));
+                progressMatchDto.setTeamOneCount(setTeamCount(teamOneDto.getTeamUserDtoList()));
                 progressMatchDto.setMonth(setMonth(sportPoolEntity.getStartDate()));
                 progressMatchDto.setDay(setDate(sportPoolEntity.getStartDate()));
                 progressMatchDtoList.add(progressMatchDto);
@@ -209,6 +211,19 @@ public class SportPoolServiceImpl implements SportPoolService {
             e.printStackTrace();
             return new ResponseEntity<>(new ResponseDto(e.getMessage()),HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    private String setTeamCount(List<TeamUserDto> teamUserDtoList) {
+
+        Integer count =0 ;
+
+        for (TeamUserDto teamUserDto : teamUserDtoList) {
+            if(teamUserDto.getUserId() != null){
+                count = count + 1;
+            }
+        }
+
+        return count.toString();
     }
 
     @Override

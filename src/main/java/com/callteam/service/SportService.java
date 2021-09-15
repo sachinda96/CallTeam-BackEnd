@@ -7,5 +7,9 @@ public interface SportService {
 
     public ResponseEntity<?> save(MultipartFile multipartFile,String sportDto);
 
+    public ResponseEntity<?> update(MultipartFile multipartFile,String sportDto);
+
+    public ResponseEntity<?> delete(String id);
+
     public ResponseEntity<?> getAll();
 }

@@ -11,6 +11,7 @@ public class SportDto {
     private Integer numberOfPlayers;
     private String imagePath;
     private String categoryId;
+    private Boolean selected;
 
     public String getId() {
         return id;
@@ -82,5 +83,13 @@ public class SportDto {
 
     public void setCategoryId(String categoryId) {
         this.categoryId = categoryId;
+    }
+
+    public Boolean getSelected() {
+        return selected;
+    }
+
+    public void setSelected(Boolean selected) {
+        this.selected = selected;
     }
 }

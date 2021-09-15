@@ -1,16 +1,18 @@
 package com.callteam.dto;
 
-import javax.xml.crypto.Data;
+import java.util.Date;
 
 public class ReviewDto {
 
     private String id;
     private String reviewUserId;
-    private String reviveUserId;
     private String reviewUserName;
+    private String receiveUserId;
+    private String receiveUserName;
     private Integer rate;
-    private Data createDate;
+    private Date createDate;
     private String review;
+    private String imagePath;
 
     public String getId() {
         return id;
@@ -28,20 +30,20 @@ public class ReviewDto {
         this.reviewUserId = reviewUserId;
     }
 
-    public String getReviveUserId() {
-        return reviveUserId;
+    public String getReceiveUserId() {
+        return receiveUserId;
     }
 
-    public void setReviveUserId(String reviveUserId) {
-        this.reviveUserId = reviveUserId;
+    public void setReceiveUserId(String receiveUserId) {
+        this.receiveUserId = receiveUserId;
     }
 
-    public String getReviewUserName() {
-        return reviewUserName;
+    public String getReceiveUserName() {
+        return receiveUserName;
     }
 
-    public void setReviewUserName(String reviewUserName) {
-        this.reviewUserName = reviewUserName;
+    public void setReceiveUserName(String receiveUserName) {
+        this.receiveUserName = receiveUserName;
     }
 
     public Integer getRate() {
@@ -52,11 +54,11 @@ public class ReviewDto {
         this.rate = rate;
     }
 
-    public Data getCreateDate() {
+    public Date getCreateDate() {
         return createDate;
     }
 
-    public void setCreateDate(Data createDate) {
+    public void setCreateDate(Date createDate) {
         this.createDate = createDate;
     }
 
@@ -66,5 +68,21 @@ public class ReviewDto {
 
     public void setReview(String review) {
         this.review = review;
+    }
+
+    public String getReviewUserName() {
+        return reviewUserName;
+    }
+
+    public void setReviewUserName(String reviewUserName) {
+        this.reviewUserName = reviewUserName;
+    }
+
+    public String getImagePath() {
+        return imagePath;
+    }
+
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
     }
 }

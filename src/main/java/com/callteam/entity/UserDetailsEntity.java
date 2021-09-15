@@ -53,6 +53,7 @@ public class UserDetailsEntity {
     @JoinColumn(name = "user_id")
     private UserEntity userEntity;
 
+
     public String getId() {
         return id;
     }

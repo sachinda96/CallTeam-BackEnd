@@ -43,17 +43,16 @@ public class SportServiceImpl implements SportService {
             SportDto sport = new ObjectMapper().readValue(sportDto,SportDto.class);
 
             sport.setId(UUID.randomUUID().toString());
+
             if(multipartFile != null){
                 sport.setImagePath(fileService.uploadFile(sport.getId(),multipartFile));
             }
 
             CategoryEntity categoryEntity =  categoryRepository.getByIdAndStatus(sport.getCategoryId(), AppConstance.STATUS_ACTIVE);
 
-
             if(categoryEntity == null){
                 return new ResponseEntity<>(new ResponseDto("Invalid Category"),HttpStatus.INTERNAL_SERVER_ERROR);
             }
-
 
             sportRepository.save(setSportEntity(sport,categoryEntity));
 
@@ -63,6 +62,64 @@ public class SportServiceImpl implements SportService {
             return new ResponseEntity<>(new ResponseDto(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
+    }
+
+    @Override
+    public ResponseEntity<?> update(MultipartFile multipartFile, String sportDto) {
+        try {
+
+            SportDto sport = new ObjectMapper().readValue(sportDto,SportDto.class);
+
+
+            if(multipartFile != null){
+                sport.setImagePath(fileService.uploadFile(sport.getId(),multipartFile));
+            }
+
+            CategoryEntity categoryEntity =  categoryRepository.getByIdAndStatus(sport.getCategoryId(), AppConstance.STATUS_ACTIVE);
+
+            if(categoryEntity == null){
+                return new ResponseEntity<>(new ResponseDto("Invalid Category"),HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+
+
+            SportEntity sportEntity = sportRepository.getById(sport.getId());
+
+            sportEntity.setAgeMax(sport.getAgeMax());
+            sportEntity.setAgeMin(sport.getAgeMin());
+            sportEntity.setImagePath(sport.getImagePath());
+            sportEntity.setNumberOfPlayers(sport.getNumberOfPlayers());
+            sportEntity.setCategoryEntity(categoryEntity);
+            sportEntity.setCreateDate(new Date());
+            sportEntity.setDescription(sport.getDescription());
+            sportEntity.setId(sport.getId());
+            sportEntity.setName(sport.getName());
+
+            sportRepository.save(sportEntity);
+
+            return new ResponseEntity<>(new ResponseDto("Successfully Updated"),HttpStatus.OK);
+        }catch (Exception e){
+            e.printStackTrace();
+            return new ResponseEntity<>(new ResponseDto(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Override
+    public ResponseEntity<?> delete(String id) {
+
+        try {
+
+        SportEntity sportEntity = sportRepository.getByIdAndStatus(id,AppConstance.STATUS_ACTIVE);
+
+        sportEntity.setStatus(AppConstance.STATUS_INACTIVE);
+
+        sportRepository.save(sportEntity);
+
+        return new ResponseEntity<>(new ResponseDto("Successfully Deleted"),HttpStatus.OK);
+
+        }catch (Exception e){
+            e.printStackTrace();
+            return new ResponseEntity<>(new ResponseDto(e.getMessage()),HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @Override
