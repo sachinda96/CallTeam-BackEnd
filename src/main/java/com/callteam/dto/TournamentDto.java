@@ -17,6 +17,7 @@ public class TournamentDto {
     private String sportId;
     private String groundId;
     private PaymentDto paymentDto;
+    private String paymentNote;
 
     public String getPoolId() {
         return poolId;
@@ -120,5 +121,13 @@ public class TournamentDto {
 
     public void setPaymentDto(PaymentDto paymentDto) {
         this.paymentDto = paymentDto;
+    }
+
+    public String getPaymentNote() {
+        return paymentNote;
+    }
+
+    public void setPaymentNote(String paymentNote) {
+        this.paymentNote = paymentNote;
     }
 }

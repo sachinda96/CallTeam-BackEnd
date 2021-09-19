@@ -53,16 +53,16 @@ public class PlayGroundServiceImpl implements PlayGroundService {
             playGroundDto.setId(UUID.randomUUID().toString());
 
             if(multipartFile != null){
-                fileService.uploadFile(playGroundDto.getId() ,multipartFile);
+                playGroundDto.setImagePath(fileService.uploadFile(playGroundDto.getId() ,multipartFile));
             }
 
             PlayGroundEntity playGroundEntity = playGroundRepository.save(setPlaygroundEntity(playGroundDto));
 
-            for (String id : playGroundDto.getSportList()) {
-                SportEntity sportEntity = sportRepository.getById(id);
+            for (PlayGroundSportDto playGroundSportDto : playGroundDto.getPlayGroundSportDtoList()) {
+                SportEntity sportEntity = sportRepository.getById(playGroundSportDto.getSportId());
 
                     if(sportEntity != null){
-                        playGroundSportRepository.save(setPlaygroundSportEntity(sportEntity,playGroundEntity));
+                        playGroundSportRepository.save(setPlaygroundSportEntity(sportEntity,playGroundEntity,playGroundSportDto));
                     }
             }
 
@@ -71,6 +71,90 @@ public class PlayGroundServiceImpl implements PlayGroundService {
         }catch (Exception e){
             e.printStackTrace();
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
+
+    @Override
+    public ResponseEntity<?> update(MultipartFile multipartFile, String playGround) {
+        try {
+
+            PlayGroundDto playGroundDto = new ObjectMapper().readValue(playGround,PlayGroundDto.class);
+
+
+            if(multipartFile != null){
+                playGroundDto.setImagePath(fileService.uploadFile(playGroundDto.getId() ,multipartFile));
+            }
+
+            PlayGroundEntity playGroundEntity = playGroundRepository.getByIdAndStatus(playGroundDto.getId(),AppConstance.STATUS_ACTIVE);
+
+            if(playGroundEntity == null){
+                return new ResponseEntity<>(new ResponseDto("Invalid Ground"),HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+
+
+           List<PlayGroundSportEntity> playGroundSportEntityList = playGroundSportRepository.findAllByPlayGroundEntityAndStatus(playGroundEntity,AppConstance.STATUS_ACTIVE);
+
+           playGroundEntity = playGroundRepository.save(setPlaygroundEntity(playGroundEntity, playGroundDto));
+
+
+            for (PlayGroundSportEntity playGroundSportEntity:
+                 playGroundSportEntityList) {
+                playGroundSportEntity.setStatus(AppConstance.STATUS_INACTIVE);
+                playGroundSportEntity.setUpdateBy(jwtTokenProvider.getUser());
+                playGroundSportEntity.setUpdateDate(new Date());
+                playGroundSportRepository.save(playGroundSportEntity);
+            }
+
+            for (PlayGroundSportDto playGroundSportDto : playGroundDto.getPlayGroundSportDtoList()) {
+                SportEntity sportEntity = sportRepository.getById(playGroundSportDto.getSportId());
+
+                if(sportEntity != null){
+                    playGroundSportRepository.save(setPlaygroundSportEntity(sportEntity,playGroundEntity,playGroundSportDto));
+                }
+            }
+
+            return new ResponseEntity<>(new ResponseDto("Successfully Updated"),HttpStatus.OK);
+
+        }catch (Exception e){
+            e.printStackTrace();
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
+
+    @Override
+    public ResponseEntity<?> delete(String id) {
+
+        try {
+
+            PlayGroundEntity playGroundEntity = playGroundRepository.getByIdAndStatus(id,AppConstance.STATUS_ACTIVE);
+
+            if(playGroundEntity == null){
+                return new ResponseEntity<>(new ResponseDto("Invalid Ground"),HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+
+
+            List<PlayGroundSportEntity> playGroundSportEntityList = playGroundSportRepository.findAllByPlayGroundEntityAndStatus(playGroundEntity,AppConstance.STATUS_ACTIVE);
+
+            playGroundEntity.setStatus(AppConstance.STATUS_INACTIVE);
+            playGroundEntity.setUpdateBy(jwtTokenProvider.getUser());
+            playGroundEntity.setUpdateDate(new Date());
+            playGroundRepository.save(playGroundEntity);
+
+            for (PlayGroundSportEntity playGroundSportEntity:
+                    playGroundSportEntityList) {
+                playGroundSportEntity.setStatus(AppConstance.STATUS_INACTIVE);
+                playGroundSportEntity.setUpdateBy(jwtTokenProvider.getUser());
+                playGroundSportEntity.setUpdateDate(new Date());
+                playGroundSportRepository.save(playGroundSportEntity);
+            }
+
+            return new ResponseEntity<>(new ResponseDto("Successfully Deleted"),HttpStatus.OK);
+
+        }catch (Exception e){
+            e.printStackTrace();
+            return new ResponseEntity<>(new ResponseDto(e.getMessage()),HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
     }
@@ -116,6 +200,34 @@ public class PlayGroundServiceImpl implements PlayGroundService {
         }
 
 
+    }
+
+    @Override
+    public ResponseEntity<?> getAllBySportId(String id) {
+        try {
+
+            SportEntity sportEntity = sportRepository.getByIdAndStatus(id,AppConstance.STATUS_ACTIVE);
+
+            if(sportEntity == null){
+                return new ResponseEntity<>(new ResponseDto("Invalid"),HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+
+            List<PlayGroundSportEntity> playGroundSportEntityList = playGroundSportRepository.findAllBySportEntityAndStatus(sportEntity,AppConstance.STATUS_ACTIVE);
+
+
+            List<PlayGroundDto> playGroundDtoList = new ArrayList<>();
+
+            for (PlayGroundSportEntity playGroundSportEntity : playGroundSportEntityList) {
+                    playGroundDtoList.add(setPlayGroundDto(playGroundSportEntity.getPlayGroundEntity(),playGroundSportEntity));
+            }
+
+
+            return new ResponseEntity<>(playGroundDtoList,HttpStatus.OK);
+
+        }catch (Exception e){
+            e.printStackTrace();
+            return new ResponseEntity<>(new ResponseDto(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @Override
@@ -212,6 +324,7 @@ public class PlayGroundServiceImpl implements PlayGroundService {
         playGroundDto.setDescription(playGroundEntity.getDescription());
         playGroundDto.setCity(playGroundEntity.getCity());
         playGroundDto.setStatus(validateOpenClose(playGroundEntity));
+        playGroundDto.setContactNo(playGroundEntity.getContactNumber());
 
         List<PlayGroundSportEntity> playGroundSportEntities = playGroundSportRepository.findAllByPlayGroundEntityAndStatus(playGroundEntity,AppConstance.STATUS_ACTIVE);
 
@@ -222,6 +335,36 @@ public class PlayGroundServiceImpl implements PlayGroundService {
         }
 
         playGroundDto.setPlayGroundSportDtoList(playGroundSportDtoList);
+
+        return playGroundDto;
+    }
+
+    public PlayGroundDto setPlayGroundDto(PlayGroundEntity playGroundEntity,PlayGroundSportEntity playGroundSportEntity){
+        PlayGroundDto playGroundDto = new PlayGroundDto();
+        playGroundDto.setAddress(playGroundEntity.getAddress());
+        playGroundDto.setId(playGroundEntity.getId());
+        playGroundDto.setOpenTime(playGroundEntity.getOpenTIme());
+        playGroundDto.setName(playGroundEntity.getName());
+        playGroundDto.setLongitude(playGroundEntity.getLongitude());
+        playGroundDto.setLatitude(playGroundEntity.getLatitude());
+        playGroundDto.setDistrict(playGroundEntity.getDistrict());
+        playGroundDto.setCloseTime(playGroundEntity.getCloseTime());
+        playGroundDto.setCloseDays(playGroundDto.getCloseDays());
+        playGroundDto.setCity(playGroundDto.getCity());
+        playGroundDto.setName(playGroundDto.getName());
+        playGroundDto.setImagePath(playGroundEntity.getImagePath());
+        playGroundDto.setDescription(playGroundEntity.getDescription());
+        playGroundDto.setCity(playGroundEntity.getCity());
+        playGroundDto.setStatus(validateOpenClose(playGroundEntity));
+        playGroundDto.setContactNo(playGroundEntity.getContactNumber());
+
+        if(playGroundSportEntity.getPricePerHour() == null && playGroundSportEntity.getPricePerHour() == 0){
+            playGroundDto.setPrice("FREE");
+        }else {
+            playGroundDto.setPrice(playGroundSportEntity.getPricePerHour().toString());
+        }
+
+
 
         return playGroundDto;
     }
@@ -257,8 +400,6 @@ public class PlayGroundServiceImpl implements PlayGroundService {
                 status = "CLOSED";
             }
 
-
-
             return status;
 
         }catch (Exception e){
@@ -280,7 +421,7 @@ public class PlayGroundServiceImpl implements PlayGroundService {
         return playGroundSportDto;
     }
 
-    private PlayGroundSportEntity setPlaygroundSportEntity(SportEntity sportEntity, PlayGroundEntity playGroundEntity) {
+    private PlayGroundSportEntity setPlaygroundSportEntity(SportEntity sportEntity, PlayGroundEntity playGroundEntity,PlayGroundSportDto playGroundSportDto) {
 
         PlayGroundSportEntity playGroundSportEntity = new PlayGroundSportEntity();
         playGroundSportEntity.setPlayGroundEntity(playGroundEntity);
@@ -289,6 +430,8 @@ public class PlayGroundServiceImpl implements PlayGroundService {
         playGroundSportEntity.setStatus(AppConstance.STATUS_ACTIVE);
         playGroundSportEntity.setCreateDate(new Date());
         playGroundSportEntity.setId(UUID.randomUUID().toString());
+        playGroundSportEntity.setNoOfTeams(playGroundSportDto.getNoOfTeams());
+        playGroundSportEntity.setPricePerHour(playGroundSportDto.getPricePerHour());
         return playGroundSportEntity;
     }
 
@@ -307,6 +450,30 @@ public class PlayGroundServiceImpl implements PlayGroundService {
         playGroundEntity.setCloseTime(playGroundDto.getCloseTime());
         playGroundEntity.setStatus(AppConstance.STATUS_ACTIVE);
         playGroundEntity.setImagePath(playGroundDto.getImagePath());
+        playGroundEntity.setContactNumber(playGroundDto.getContactNo());
+        playGroundEntity.setCity(playGroundDto.getCity());
+        playGroundEntity.setDescription(playGroundDto.getDescription());
+        playGroundEntity.setImagePath(playGroundDto.getImagePath());
+        return playGroundEntity;
+    }
+
+
+    private PlayGroundEntity setPlaygroundEntity(PlayGroundEntity playGroundEntity,PlayGroundDto playGroundDto) {
+        playGroundEntity.setAddress(playGroundDto.getAddress());
+        playGroundEntity.setCity(playGroundDto.getCity());
+        playGroundEntity.setDistrict(playGroundDto.getDistrict());
+        playGroundEntity.setLatitude(playGroundDto.getLatitude());
+        playGroundEntity.setUpdateDate(new Date());
+        playGroundEntity.setUpdateBy(jwtTokenProvider.getUser());
+        playGroundEntity.setLongitude(playGroundDto.getLongitude());
+        playGroundEntity.setName(playGroundDto.getName());
+        playGroundEntity.setCloseDays(playGroundDto.getCloseDays());
+        playGroundEntity.setOpenTIme(playGroundDto.getOpenTime());
+        playGroundEntity.setCloseTime(playGroundDto.getCloseTime());
+        playGroundEntity.setImagePath(playGroundDto.getImagePath());
+        playGroundEntity.setContactNumber(playGroundDto.getContactNo());
+        playGroundEntity.setCity(playGroundDto.getCity());
+        playGroundEntity.setDescription(playGroundDto.getDescription());
         return playGroundEntity;
     }
 

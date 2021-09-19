@@ -116,6 +116,7 @@ public class TournamentServiceImpl implements TournamentService {
                     tournamentPoolDto.setSport(tournamentEntity.getSportEntity().getName());
                     tournamentPoolDto.setNoOfTeam(tournamentEntity.getNoOfTeam());
                     tournamentPoolDto.setId(tournamentEntity.getId());
+
                     tournamentPoolDtoList.add(tournamentPoolDto);
 
                 }
@@ -189,6 +190,7 @@ public class TournamentServiceImpl implements TournamentService {
         tournamentDto.setStartTime(tournamentEntity.getStartTime());
         tournamentDto.setPoolId(tournamentEntity.getPoolId());
         tournamentDto.setTournamentName(tournamentEntity.getName());
+        tournamentDto.setPaymentNote(tournamentEntity.getPaymentNote());
         return tournamentDto;
     }
 
@@ -211,6 +213,7 @@ public class TournamentServiceImpl implements TournamentService {
         tournamentEntity.setDistrict(tournamentDto.getDistrict());
         tournamentEntity.setEndTime(tournamentDto.getEndTime());
         tournamentEntity.setPoolId(tournamentDto.getPoolId());
+        tournamentEntity.setPaymentNote(tournamentDto.getPaymentNote());
 
         return tournamentEntity;
     }

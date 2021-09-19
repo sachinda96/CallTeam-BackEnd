@@ -8,9 +8,15 @@ public interface PlayGroundService {
 
     public ResponseEntity<?> save(MultipartFile multipartFile,String playGroundDto);
 
+    public ResponseEntity<?> update(MultipartFile multipartFile,String playGroundDto);
+
+    public ResponseEntity<?> delete(String id);
+
     public ResponseEntity<?> getAll();
 
     public ResponseEntity<?> getById(String id);
+
+    public ResponseEntity<?> getAllBySportId(String id);
 
     public ResponseEntity<?> getAllByCity(String city);
 

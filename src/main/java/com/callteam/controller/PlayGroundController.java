@@ -19,6 +19,16 @@ public class PlayGroundController {
         return playGroundService.save(multipartFile,playGround);
     }
 
+    @PostMapping("/update")
+    public ResponseEntity<?> update(@RequestParam(required = false,name = "file") MultipartFile multipartFile , @RequestParam(name = "playGround") String playGround){
+        return playGroundService.update(multipartFile,playGround);
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<?> delete(@PathVariable String id){
+        return playGroundService.delete(id);
+    }
+
     @GetMapping
     public ResponseEntity<?> getAllGrounds(){
         return playGroundService.getAll();
@@ -43,4 +53,10 @@ public class PlayGroundController {
     public ResponseEntity<?> pagesCount(){
         return playGroundService.pagesCount();
     }
+
+    @GetMapping("/getAllBySportId/{id}")
+    public ResponseEntity<?> getAllBySportId(@PathVariable String id){
+        return playGroundService.getAllBySportId(id);
+    }
+
 }

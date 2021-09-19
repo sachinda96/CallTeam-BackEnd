@@ -47,6 +47,8 @@ public class TournamentEntity {
 
     private Date updateDate;
 
+    private String paymentNote;
+
     @ManyToOne
     @JoinColumn(name = "sport_id")
     private SportEntity sportEntity;
@@ -209,5 +211,13 @@ public class TournamentEntity {
 
     public void setPoolId(String poolId) {
         this.poolId = poolId;
+    }
+
+    public String getPaymentNote() {
+        return paymentNote;
+    }
+
+    public void setPaymentNote(String paymentNote) {
+        this.paymentNote = paymentNote;
     }
 }

@@ -1,6 +1,5 @@
 package com.callteam.dto;
 
-import javax.persistence.Column;
 import java.util.List;
 
 public class PlayGroundDto {
@@ -17,6 +16,8 @@ public class PlayGroundDto {
     private String closeTime;
     private String imagePath;
     private String status;
+    private String price;
+    private String contactNo;
     private List<String> closeDays;
     private List<String> sportList;
     private List<PlayGroundSportDto> playGroundSportDtoList;
@@ -139,5 +140,21 @@ public class PlayGroundDto {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getPrice() {
+        return price;
+    }
+
+    public void setPrice(String price) {
+        this.price = price;
+    }
+
+    public String getContactNo() {
+        return contactNo;
+    }
+
+    public void setContactNo(String contactNo) {
+        this.contactNo = contactNo;
     }
 }
