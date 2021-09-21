@@ -43,6 +43,13 @@ public class PlayGroundServiceImpl implements PlayGroundService {
     @Autowired
     private FileService fileService;
 
+    /**
+     *
+     * @param multipartFile
+     * @param playGround
+     * @return Response with save status
+     * Save playground details to the database
+     */
     @Override
     public ResponseEntity<?> save(MultipartFile multipartFile, String playGround) {
 
@@ -75,6 +82,13 @@ public class PlayGroundServiceImpl implements PlayGroundService {
 
     }
 
+    /**
+     *
+     * @param multipartFile
+     * @param playGround
+     * @return Response with update status
+     *
+     */
     @Override
     public ResponseEntity<?> update(MultipartFile multipartFile, String playGround) {
         try {
@@ -123,6 +137,12 @@ public class PlayGroundServiceImpl implements PlayGroundService {
 
     }
 
+    /**
+     *
+     * @param id
+     * @return Response entity status of delete
+     * Change status as a INACTIve and generate the response
+     */
     @Override
     public ResponseEntity<?> delete(String id) {
 
@@ -159,6 +179,10 @@ public class PlayGroundServiceImpl implements PlayGroundService {
 
     }
 
+    /**
+     *
+     * @return Response entity with all ground data
+     */
     @Override
     public ResponseEntity<?> getAll() {
 
@@ -181,6 +205,12 @@ public class PlayGroundServiceImpl implements PlayGroundService {
 
     }
 
+    /**
+     *
+     * @param id
+     * @return ResponseEntity
+     * Get Playground data regarding the playground id
+     */
     @Override
     public ResponseEntity<?> getById(String id) {
 
@@ -230,6 +260,12 @@ public class PlayGroundServiceImpl implements PlayGroundService {
         }
     }
 
+    /**
+     *
+     * @param city
+     * @return ResponseEntity with lists
+     * Get all play grounds form the database by city and generate the response
+     */
     @Override
     public ResponseEntity<?> getAllByCity(String city) {
 
@@ -252,6 +288,10 @@ public class PlayGroundServiceImpl implements PlayGroundService {
 
     }
 
+    /**
+     *
+     * @return ResponseEntity page count
+     */
     @Override
     public ResponseEntity pagesCount() {
 
@@ -285,6 +325,12 @@ public class PlayGroundServiceImpl implements PlayGroundService {
 
     }
 
+    /**
+     *
+     * @param index
+     * @return ResponseEntity with lists
+     * Get Playground data `by the page number form the database and generate the response
+     */
     @Override
     public ResponseEntity<?> getAllByPage(int index) {
 
@@ -307,6 +353,11 @@ public class PlayGroundServiceImpl implements PlayGroundService {
 
     }
 
+    /**
+     *
+     * @param playGroundEntity
+     * @return PlayGroundDto
+     */
     private PlayGroundDto setPlayGround(PlayGroundEntity playGroundEntity) {
         PlayGroundDto playGroundDto = new PlayGroundDto();
         playGroundDto.setAddress(playGroundEntity.getAddress());
@@ -339,6 +390,12 @@ public class PlayGroundServiceImpl implements PlayGroundService {
         return playGroundDto;
     }
 
+    /**
+     *
+     * @param playGroundEntity
+     * @param playGroundSportEntity
+     * @return PlayGroundDto
+     */
     public PlayGroundDto setPlayGroundDto(PlayGroundEntity playGroundEntity,PlayGroundSportEntity playGroundSportEntity){
         PlayGroundDto playGroundDto = new PlayGroundDto();
         playGroundDto.setAddress(playGroundEntity.getAddress());
@@ -369,6 +426,11 @@ public class PlayGroundServiceImpl implements PlayGroundService {
         return playGroundDto;
     }
 
+    /**
+     *
+     * @param playGroundEntity
+     * @return String
+     */
     private String validateOpenClose(PlayGroundEntity playGroundEntity) {
 
         try {
@@ -411,6 +473,11 @@ public class PlayGroundServiceImpl implements PlayGroundService {
 
     }
 
+    /**
+     *
+     * @param playGroundSportEntity
+     * @return PlayGroundSportDto
+     */
     private PlayGroundSportDto setPlayGroundSportDto(PlayGroundSportEntity playGroundSportEntity) {
         PlayGroundSportDto playGroundSportDto = new PlayGroundSportDto();
         playGroundSportDto.setSport(playGroundSportEntity.getSportEntity().getName());
@@ -421,6 +488,13 @@ public class PlayGroundServiceImpl implements PlayGroundService {
         return playGroundSportDto;
     }
 
+    /**
+     *
+     * @param sportEntity
+     * @param playGroundEntity
+     * @param playGroundSportDto
+     * @return PlayGroundSportEntity
+     */
     private PlayGroundSportEntity setPlaygroundSportEntity(SportEntity sportEntity, PlayGroundEntity playGroundEntity,PlayGroundSportDto playGroundSportDto) {
 
         PlayGroundSportEntity playGroundSportEntity = new PlayGroundSportEntity();
@@ -435,6 +509,11 @@ public class PlayGroundServiceImpl implements PlayGroundService {
         return playGroundSportEntity;
     }
 
+    /**
+     *
+     * @param playGroundDto
+     * @return PlayGroundEntity
+     */
     private PlayGroundEntity setPlaygroundEntity(PlayGroundDto playGroundDto) {
         PlayGroundEntity playGroundEntity = new PlayGroundEntity();
         playGroundEntity.setAddress(playGroundDto.getAddress());
@@ -457,7 +536,12 @@ public class PlayGroundServiceImpl implements PlayGroundService {
         return playGroundEntity;
     }
 
-
+    /**
+     *
+     * @param playGroundEntity
+     * @param playGroundDto
+     * @return PlayGroundEntity
+     */
     private PlayGroundEntity setPlaygroundEntity(PlayGroundEntity playGroundEntity,PlayGroundDto playGroundDto) {
         playGroundEntity.setAddress(playGroundDto.getAddress());
         playGroundEntity.setCity(playGroundDto.getCity());
@@ -477,6 +561,11 @@ public class PlayGroundServiceImpl implements PlayGroundService {
         return playGroundEntity;
     }
 
+    /**
+     *
+     * @param day
+     * @return String
+     */
     private String getDate(int day){
         switch (day) {
             case 1:

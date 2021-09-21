@@ -16,6 +16,7 @@ public class TournamentDto {
     private Integer noOfTeam;
     private String sportId;
     private String groundId;
+    private String userId;
     private PaymentDto paymentDto;
     private String paymentNote;
 
@@ -129,5 +130,13 @@ public class TournamentDto {
 
     public void setPaymentNote(String paymentNote) {
         this.paymentNote = paymentNote;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 }

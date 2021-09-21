@@ -46,8 +46,19 @@ public class SportPoolController {
         return sportPoolService.getAllSportPoolByUser(userId);
     }
 
+    @GetMapping("/getAllSportPoolCreateByUser/{userId}")
+    public ResponseEntity<?> getAllSportPoolCreateByUser(@PathVariable String userId){
+        return sportPoolService.getAllSportPoolCreateByUser(userId);
+    }
+
     @GetMapping("/getSportPool/{id}")
     public ResponseEntity<?> getSportPool(@PathVariable String id){
         return sportPoolService.getSportPool(id);
     }
+
+    @DeleteMapping("/cancelSportPool/{id}")
+    public ResponseEntity<?> cancelSportPool(@PathVariable String id){
+        return sportPoolService.cancelSportPool(id);
+    }
+
 }

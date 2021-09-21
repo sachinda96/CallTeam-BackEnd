@@ -12,6 +12,14 @@ public class SportPoolReservation {
    private Map<String, PoolDto> sportPool = new HashMap<>();
 
 
+    /**
+     *
+     * @param userDetailsDto
+     * @param poolDto
+     * @param noOfTeam
+     * @return pool id
+     * @throws Exception
+     */
    public String newSportPool(UserDetailsDto userDetailsDto,PoolDto poolDto,Integer noOfTeam) throws Exception{
 
        String id = UUID.randomUUID().toString();
@@ -54,6 +62,15 @@ public class SportPoolReservation {
        return id;
    }
 
+    /**
+     *
+     * @param poolId
+     * @param teamId
+     * @param index
+     * @param userDetailsDto
+     * @return boolean
+     * @throws Exception
+     */
    public boolean joinPool(String poolId, String teamId, Integer index, UserDetailsDto userDetailsDto)throws Exception{
 
        PoolDto poolDto = sportPool.get(poolId);
@@ -94,6 +111,14 @@ public class SportPoolReservation {
        return true;
    }
 
+    /**
+     *
+     * @param poolId
+     * @param poolDto
+     * @param userDetailsDto
+     * @return boolean
+     * @throws Exception
+     */
     public boolean validateUserOldJoin(String poolId,PoolDto poolDto, UserDetailsDto userDetailsDto) throws Exception {
 
 
@@ -123,6 +148,15 @@ public class SportPoolReservation {
 
    }
 
+    /**
+     *
+     * @param poolId
+     * @param teamId
+     * @param index
+     * @param userId
+     * @return boolean
+     * @throws Exception
+     */
     public boolean dropTeam(String poolId, String teamId, Integer index,String userId) throws Exception{
 
        PoolDto poolDto = sportPool.get(poolId);
@@ -159,6 +193,14 @@ public class SportPoolReservation {
 
    }
 
+    /**
+     *
+     * @param poolId
+     * @param teamId
+     * @param name
+     * @return boolean
+     * @throws Exception
+     */
    public boolean updateTeamName(String poolId,String teamId,String name) throws Exception{
 
        PoolDto poolDto = sportPool.get(poolId);
@@ -186,6 +228,12 @@ public class SportPoolReservation {
 
    }
 
+    /**
+     *
+     * @param poolId
+     * @return boolean
+     * @throws Exception
+     */
     public ReservationPoolDto getPoolDetails(String poolId) throws Exception{
 
         PoolDto poolDto = sportPool.get(poolId);
@@ -202,4 +250,8 @@ public class SportPoolReservation {
 
     }
 
+
+    public void removePool(String poolId){
+       this.sportPool.remove(poolId);
+    }
 }

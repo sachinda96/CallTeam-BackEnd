@@ -34,6 +34,11 @@ public class PlayerServiceImpl implements PlayerService {
     @Autowired
     private UserSportRepository userSportRepository;
 
+    /**
+     *
+     * @return ResponseEntity with list
+     * Get all player data from the database and generate the response
+     */
     @Override
     public ResponseEntity<?> getAllPlayers() {
 
@@ -61,6 +66,11 @@ public class PlayerServiceImpl implements PlayerService {
 
     }
 
+    /**
+     *
+     * @param id
+     * @return get
+     */
     @Override
     public ResponseEntity<?> getPlayersById(String id) {
 

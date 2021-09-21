@@ -36,6 +36,12 @@ public class ReviewServiceImpl implements ReviewService {
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
 
+    /**
+     *
+     * @param reviewDto
+     * @return Response with save status
+     * Save Review to the database and generate the response
+     */
     @Override
     public ResponseEntity<?> addReview(ReviewDto reviewDto) {
 
@@ -73,6 +79,12 @@ public class ReviewServiceImpl implements ReviewService {
 
     }
 
+    /**
+     *
+     * @param id
+     * @return Response with review details
+     * Get Review details By User id
+     */
     @Override
     public ResponseEntity<?> getReviewByUserId(String id) {
 

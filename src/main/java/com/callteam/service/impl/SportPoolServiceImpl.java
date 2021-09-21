@@ -5,7 +5,6 @@ import com.callteam.repository.*;
 import com.callteam.reservation.SportPoolReservation;
 import com.callteam.security.JwtTokenProvider;
 import com.callteam.service.SportPoolService;
-import com.callteam.service.SportService;
 import com.callteam.utill.AppConstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -48,6 +47,12 @@ public class SportPoolServiceImpl implements SportPoolService {
     @Autowired
     private UserSportRepository userSportRepository;
 
+    /**
+     *
+     * @param userPoolDto
+     * @return Response Entity
+     * Create sport pool with user pool data and reserve new pool using reservation class
+     */
     @Override
     public ResponseEntity<?> createPool(UserPoolDto userPoolDto) {
 
@@ -68,6 +73,15 @@ public class SportPoolServiceImpl implements SportPoolService {
 
     }
 
+    /**
+     *
+     * @param poolId
+     * @param teamId
+     * @param index
+     * @param userDetailsDto
+     * @return Response Entity
+     * Update the created pool with user action
+     */
     @Override
     public ResponseEntity<?> updatePool(String poolId, String teamId, Integer index, UserDetailsDto userDetailsDto) {
 
@@ -86,6 +100,15 @@ public class SportPoolServiceImpl implements SportPoolService {
 
     }
 
+    /**
+     *
+     * @param poolId
+     * @param teamId
+     * @param index
+     * @param userId
+     * @return Response entity with status
+     * Drop from the involved pool
+     */
     @Override
     public ResponseEntity<?> dropTeam(String poolId, String teamId, Integer index, String userId) {
         try {
@@ -103,18 +126,32 @@ public class SportPoolServiceImpl implements SportPoolService {
 
     }
 
+    /**
+     *
+     * @param id
+     * @return ResponseEntity with pool details
+     * Return Inprogress pool details regarding the poolId
+     */
     @Override
     public ResponseEntity<?> getPoolDetails(String id) {
+        ResponseEntity<?> result;
         try {
 
-            return new ResponseEntity<>(sportPoolReservation.getPoolDetails(id),HttpStatus.OK);
+            result = new ResponseEntity<>(sportPoolReservation.getPoolDetails(id), HttpStatus.OK);
 
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
-            return new ResponseEntity<>(new ResponseDto(e.getMessage()),HttpStatus.INTERNAL_SERVER_ERROR);
+            result = new ResponseEntity<>(new ResponseDto(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
+        return result;
     }
 
+    /**
+     *
+     * @param sportPoolReservationDto
+     * @return Response of save status
+     * Save all match pool details to the database
+     */
     @Override
     public ResponseEntity<?> saveSportPool(SportPoolReservationDto sportPoolReservationDto) {
 
@@ -140,7 +177,7 @@ public class SportPoolServiceImpl implements SportPoolService {
 
             PaymentEntity paymentEntity = paymentRepository.save(setPayment(sportPoolReservationDto.getPaymentDto()));
 
-            SportPoolEntity sportPoolEntity = sportPoolRepository.save(setSportPool(sportPoolReservationDto,sportEntity,playGroundEntity,paymentEntity));
+            SportPoolEntity sportPoolEntity = sportPoolRepository.save(setSportPool(sportPoolReservationDto,sportEntity,playGroundEntity,paymentEntity,userEntity));
 
             sportPoolDetailsRepository.save(setSportPoolDetailsEntity(sportPoolEntity,userEntity));
 
@@ -152,6 +189,12 @@ public class SportPoolServiceImpl implements SportPoolService {
 
     }
 
+    /**
+     *
+     * @param userId
+     * @return Response all sport pool
+     * Get all sport pool regarding the user city and user interested sport
+     */
     @Override
     public ResponseEntity<?> getAllSportPoolByUser(String userId) {
 
@@ -213,6 +256,67 @@ public class SportPoolServiceImpl implements SportPoolService {
         }
     }
 
+    /**
+     *
+     * @param userId
+     * @return response with all pool deatils
+     * Get all pool details from the database using Create by user
+     */
+    @Override
+    public ResponseEntity<?> getAllSportPoolCreateByUser(String userId) {
+        try {
+
+            UserEntity userEntity = userRepository.getByIdAndStatus(userId,AppConstance.STATUS_ACTIVE);
+
+            if(userEntity == null){
+                return new ResponseEntity<>(new ResponseDto("Invalid User"),HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+
+
+            List<SportPoolEntity> sportPoolEntities = sportPoolRepository.findAllByCreateByAndStatus(userEntity.getId(),AppConstance.STATUS_ACTIVE);
+
+            List<ProgressMatchDto> progressMatchDtoList = new ArrayList<>();
+
+            for (SportPoolEntity sportPoolEntity : sportPoolEntities) {
+
+                ProgressMatchDto progressMatchDto = new ProgressMatchDto();
+                progressMatchDto.setDate(sportPoolEntity.getStartDate());
+                progressMatchDto.setGroundCity(sportPoolEntity.getPlayGroundEntity().getCity());
+                progressMatchDto.setGroundName(sportPoolEntity.getPlayGroundEntity().getName());
+                progressMatchDto.setId(sportPoolEntity.getId());
+                progressMatchDto.setName(sportPoolEntity.getName());
+
+                try {
+                    ReservationPoolDto reservationPoolDto = sportPoolReservation.getPoolDetails(sportPoolEntity.getPoolId());
+                    TeamDto teamOneDto = reservationPoolDto.getTeamDtoList().get(0);
+                    TeamDto teamTwoDto = reservationPoolDto.getTeamDtoList().get(1);
+                    progressMatchDto.setTeamOneName(teamOneDto.getTeamName());
+                    progressMatchDto.setTeamTwoName(teamTwoDto.getTeamName());
+                    progressMatchDto.setTeamOneId(teamOneDto.id);
+                    progressMatchDto.setTeamTwoId(teamTwoDto.id);
+
+                    progressMatchDto.setTeamTwoCount(setTeamCount(teamTwoDto.getTeamUserDtoList()));
+                    progressMatchDto.setTeamOneCount(setTeamCount(teamOneDto.getTeamUserDtoList()));
+                }catch (Exception e){}
+
+                progressMatchDto.setMonth(setMonth(sportPoolEntity.getStartDate()));
+                progressMatchDto.setDay(setDate(sportPoolEntity.getStartDate()));
+                progressMatchDtoList.add(progressMatchDto);
+            }
+
+            return new ResponseEntity<>(progressMatchDtoList,HttpStatus.OK);
+
+        }catch (Exception e){
+            e.printStackTrace();
+            return new ResponseEntity<>(new ResponseDto(e.getMessage()),HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     *
+     * @param teamUserDtoList
+     * @return
+     */
     private String setTeamCount(List<TeamUserDto> teamUserDtoList) {
 
         Integer count =0 ;
@@ -226,6 +330,12 @@ public class SportPoolServiceImpl implements SportPoolService {
         return count.toString();
     }
 
+    /**
+     *
+     * @param id
+     * @return Response with pool details
+     * Get pool details from the database using pool id and generate the response
+     */
     @Override
     public ResponseEntity<?> getSportPool(String id) {
 
@@ -251,6 +361,41 @@ public class SportPoolServiceImpl implements SportPoolService {
         }
     }
 
+    /**
+     *
+     * @param id
+     * @return Response status of cancel status
+     * Change status in sport poll as a CANCEL
+     */
+    @Override
+    public ResponseEntity<?> cancelSportPool(String id) {
+
+        try {
+
+            SportPoolEntity sportPoolEntity = sportPoolRepository.getByIdAndStatus(id,AppConstance.STATUS_ACTIVE);
+
+            if(sportPoolEntity == null){
+                return new ResponseEntity<>(new ResponseDto("Invalid Sport Details"),HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+
+            sportPoolEntity.setStatus(AppConstance.STATUS_CANCEL);
+            sportPoolRepository.save(sportPoolEntity);
+
+            sportPoolReservation.removePool(sportPoolEntity.getPoolId());
+
+            return new ResponseEntity<>(new ResponseDto("Match Pool Cancelled"),HttpStatus.OK);
+
+        }catch (Exception e){
+            e.printStackTrace();
+            return new ResponseEntity<>(new ResponseDto(e.getMessage()),HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     *
+     * @param sportPoolEntity
+     * @return poolDeto
+     */
     private PoolDto setPoolDto(SportPoolEntity sportPoolEntity) {
         PoolDto poolDto = new PoolDto();
         poolDto.setCity(sportPoolEntity.getCity());
@@ -266,6 +411,11 @@ public class SportPoolServiceImpl implements SportPoolService {
         return poolDto;
     }
 
+    /**
+     *
+     * @param playGroundEntity
+     * @return PlayGroundDto
+     */
     private PlayGroundDto setPlayGroundDto(PlayGroundEntity playGroundEntity) {
         PlayGroundDto playGroundDto = new PlayGroundDto();
         playGroundDto.setName(playGroundEntity.getName());
@@ -277,6 +427,11 @@ public class SportPoolServiceImpl implements SportPoolService {
         return playGroundDto;
     }
 
+    /**
+     *
+     * @param sportEntity
+     * @return SportDto
+     */
     private SportDto setSportPoolDto(SportEntity sportEntity) {
         SportDto sportDto = new SportDto();
         sportDto.setImagePath(sportEntity.getImagePath());
@@ -290,16 +445,33 @@ public class SportPoolServiceImpl implements SportPoolService {
         return sportDto;
     }
 
+    /**
+     *
+     * @param startDate
+     * @return String
+     */
     private String setMonth(Date startDate) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MMM");
         return simpleDateFormat.format(startDate).toUpperCase();
     }
+
+    /**
+     *
+     * @param startDate
+     * @return
+     */
     private String setDate(Date startDate){
         Calendar date = new GregorianCalendar();
         date.setTime(startDate);
         return String.valueOf(date.get(Calendar.DAY_OF_MONTH));
     }
 
+    /**
+     *
+     * @param sportPoolEntity
+     * @param userEntity
+     * @return SportPoolDetailsEntity
+     */
     private SportPoolDetailsEntity setSportPoolDetailsEntity(SportPoolEntity sportPoolEntity, UserEntity userEntity) {
         SportPoolDetailsEntity sportPoolDetailsEntity = new SportPoolDetailsEntity();
         sportPoolDetailsEntity.setSportPoolEntity(sportPoolEntity);
@@ -312,7 +484,16 @@ public class SportPoolServiceImpl implements SportPoolService {
 
     }
 
-    private SportPoolEntity setSportPool(SportPoolReservationDto sportPoolReservationDto, SportEntity sportEntity, PlayGroundEntity playGroundEntity, PaymentEntity paymentEntity) {
+    /**
+     *
+     * @param sportPoolReservationDto
+     * @param sportEntity
+     * @param playGroundEntity
+     * @param paymentEntity
+     * @param userEntity
+     * @return SportPoolEntity
+     */
+    private SportPoolEntity setSportPool(SportPoolReservationDto sportPoolReservationDto, SportEntity sportEntity, PlayGroundEntity playGroundEntity, PaymentEntity paymentEntity,UserEntity userEntity) {
         SportPoolEntity sportPoolEntity = new SportPoolEntity();
         sportPoolEntity.setSportEntity(sportEntity);
         sportPoolEntity.setPaymentEntity(paymentEntity);
@@ -324,20 +505,22 @@ public class SportPoolServiceImpl implements SportPoolService {
         sportPoolEntity.setStartDate(sportPoolReservationDto.getPoolDto().getDate());
         sportPoolEntity.setId(UUID.randomUUID().toString());
         sportPoolEntity.setCreateDate(new Date());
-        sportPoolEntity.setCreateBy(jwtTokenProvider.getUser());
+        sportPoolEntity.setCreateBy(userEntity.getId());
         sportPoolEntity.setPlayGroundEntity(playGroundEntity);
         sportPoolEntity.setPoolId(sportPoolReservationDto.getPoolId());
         return sportPoolEntity;
     }
 
+    /**
+     *
+     * @param paymentDto
+     * @return
+     */
     private PaymentEntity setPayment(PaymentDto paymentDto) {
         PaymentEntity paymentEntity = new PaymentEntity();
         paymentEntity.setCreateBy(jwtTokenProvider.getUser());
         paymentEntity.setId(UUID.randomUUID().toString());
-        //paymentEntity.setType(paymentDto.getType());
-        //paymentEntity.setMethod(paymentDto.getMethod());
         paymentEntity.setCreateDate(new Date());
-        //paymentEntity.setAmount(paymentDto.getAmount());
         paymentEntity.setStatus(AppConstance.STATUS_ACTIVE);
         return paymentEntity;
 

@@ -19,5 +19,9 @@ public interface SportPoolService {
 
     public ResponseEntity<?> getAllSportPoolByUser(String userId);
 
+    public ResponseEntity<?> getAllSportPoolCreateByUser(String userId);
+
     public ResponseEntity<?> getSportPool(String id);
+
+    public ResponseEntity<?> cancelSportPool(String id);
 }

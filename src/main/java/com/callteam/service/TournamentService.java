@@ -11,4 +11,7 @@ public interface TournamentService {
 
     public ResponseEntity<?> getTournament(String id);
 
+    public ResponseEntity<?> getTournamentsCreateByUser(String id);
+
+    public ResponseEntity<?> cancelTouranament(String id);
 }

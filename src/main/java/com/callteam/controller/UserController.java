@@ -26,7 +26,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginDto loginDto) throws InterruptedException {
+    public ResponseEntity<?> login(@RequestBody LoginDto loginDto){
         return userService.login(loginDto);
     }
 

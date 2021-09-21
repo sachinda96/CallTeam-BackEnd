@@ -10,4 +10,6 @@ public interface SportPoolRepository extends JpaRepository<SportPoolEntity,Strin
     List<SportPoolEntity> findAllBySportEntityInAndCityAndStatus(List<SportEntity> sportEntityList, String city, String statusActive);
 
     SportPoolEntity getByIdAndStatus(String id, String statusActive);
+
+    List<SportPoolEntity> findAllByCreateByAndStatus(String id, String statusActive);
 }

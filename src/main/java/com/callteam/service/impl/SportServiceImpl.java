@@ -35,6 +35,13 @@ public class SportServiceImpl implements SportService {
     private FileService fileService;
 
 
+    /**
+     *
+     * @param multipartFile
+     * @param sportDto
+     * @return Response Entity
+     * Save Sport data to the database and genearate the response
+     */
     @Override
     public ResponseEntity<?> save(MultipartFile multipartFile, String sportDto) {
 
@@ -64,6 +71,12 @@ public class SportServiceImpl implements SportService {
 
     }
 
+    /**
+     *
+     * @param multipartFile
+     * @param sportDto
+     * @return Response Entity with update status
+     */
     @Override
     public ResponseEntity<?> update(MultipartFile multipartFile, String sportDto) {
         try {
@@ -103,6 +116,12 @@ public class SportServiceImpl implements SportService {
         }
     }
 
+    /**
+     *
+     * @param id
+     * @return Response Entity with delete status
+     * Change the record as a INACTIVE from the database and generate the response
+     */
     @Override
     public ResponseEntity<?> delete(String id) {
 
@@ -122,6 +141,11 @@ public class SportServiceImpl implements SportService {
         }
     }
 
+    /**
+     *
+     * @return
+     * Get all data from the database and return all
+     */
     @Override
     public ResponseEntity<?> getAll() {
 
@@ -141,6 +165,11 @@ public class SportServiceImpl implements SportService {
 
     }
 
+    /**
+     *
+     * @param sportEntity
+     * @return SportDto
+     */
     public SportDto setSportDto(SportEntity sportEntity){
         SportDto sportDto = new SportDto();
         sportDto.setAgeMax(sportEntity.getAgeMax());
@@ -156,6 +185,12 @@ public class SportServiceImpl implements SportService {
 
     }
 
+    /**
+     *
+     * @param sportDto
+     * @param categoryEntity
+     * @return SportEntity
+     */
     public SportEntity setSportEntity(SportDto sportDto,CategoryEntity categoryEntity){
 
         SportEntity sportEntity = new SportEntity();

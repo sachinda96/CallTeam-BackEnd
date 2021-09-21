@@ -11,4 +11,6 @@ public interface TournamentRepository extends JpaRepository<TournamentEntity,Str
     List<TournamentEntity> findAllBySportEntityInAndCityAndStatus(List<SportEntity> sportEntityList, String city, String statusActive);
 
     TournamentEntity getByIdAndStatus(String id, String statusActive);
+
+    List<TournamentEntity> findAllByCreateByAndStatus(String id, String statusActive);
 }

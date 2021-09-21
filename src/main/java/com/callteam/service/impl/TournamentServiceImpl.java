@@ -65,10 +65,17 @@ public class TournamentServiceImpl implements TournamentService {
                 return new ResponseEntity<>(new ResponseDto("Invalid Play Grounds"), HttpStatus.INTERNAL_SERVER_ERROR);
             }
 
+            UserEntity userEntity = userRepository.getByIdAndStatus(tournamentDto.getUserId(),AppConstance.STATUS_ACTIVE);
+
+
+            if(userEntity == null){
+                return new ResponseEntity<>(new ResponseDto("Invalid User"), HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+
             PaymentEntity paymentEntity = paymentRepository.save(setPayment(tournamentDto.getPaymentDto()));
 
 
-            tournamentRepository.save(setTournamentEntity(tournamentDto,paymentEntity,playGroundEntity,sportEntity));
+            tournamentRepository.save(setTournamentEntity(tournamentDto,paymentEntity,playGroundEntity,sportEntity,userEntity));
 
             return new ResponseEntity<>(new ResponseDto("Successfully Saved"),HttpStatus.OK);
         }catch (Exception e){
@@ -157,6 +164,64 @@ public class TournamentServiceImpl implements TournamentService {
 
     }
 
+    @Override
+    public ResponseEntity<?> getTournamentsCreateByUser(String id) {
+
+        try {
+
+            List<TournamentPoolDto> tournamentPoolDtoList = new ArrayList<>();
+
+
+                List<TournamentEntity> tournamentEntities = tournamentRepository.findAllByCreateByAndStatus(id,AppConstance.STATUS_ACTIVE);
+
+                for (TournamentEntity tournamentEntity : tournamentEntities) {
+
+                    TournamentPoolDto tournamentPoolDto = new TournamentPoolDto();
+                    tournamentPoolDto.setDate(setDate(tournamentEntity.getStartDate()));
+                    tournamentPoolDto.setMonth(setMonth(tournamentEntity.getStartDate()));
+                    tournamentPoolDto.setCity(tournamentEntity.getCity());
+                    tournamentPoolDto.setGroundName(tournamentEntity.getPlayGroundEntity().getName());
+                    tournamentPoolDto.setDescription(tournamentEntity.getDescription());
+                    tournamentPoolDto.setName(tournamentEntity.getName());
+                    tournamentPoolDto.setSport(tournamentEntity.getSportEntity().getName());
+                    tournamentPoolDto.setNoOfTeam(tournamentEntity.getNoOfTeam());
+                    tournamentPoolDto.setId(tournamentEntity.getId());
+
+                    tournamentPoolDtoList.add(tournamentPoolDto);
+
+                }
+
+            return new ResponseEntity<>(tournamentPoolDtoList,HttpStatus.OK);
+
+        }catch (Exception e){
+            e.printStackTrace();
+            return new ResponseEntity<>(new ResponseDto(e.getMessage()),HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Override
+    public ResponseEntity<?> cancelTouranament(String id) {
+        try {
+
+            TournamentEntity tournamentEntity = tournamentRepository.getByIdAndStatus(id,AppConstance.STATUS_ACTIVE);
+
+            if(tournamentEntity == null){
+                return new ResponseEntity<>(new ResponseDto("Invalid Tournament"),HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+
+            tournamentEntity.setStatus(AppConstance.STATUS_CANCEL);
+            tournamentRepository.save(tournamentEntity);
+
+            sportPoolReservation.removePool(tournamentEntity.getPoolId());
+
+            return new ResponseEntity<>(new ResponseDto("Tournament Canceled"),HttpStatus.OK);
+
+        }catch (Exception e){
+            e.printStackTrace();
+            return new ResponseEntity<>(new ResponseDto(e.getMessage()),HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     private PlayGroundDto setPlayGround(PlayGroundEntity playGroundEntity) {
         PlayGroundDto playGroundDto = new PlayGroundDto();
         playGroundDto.setDistrict(playGroundEntity.getDistrict());
@@ -194,7 +259,7 @@ public class TournamentServiceImpl implements TournamentService {
         return tournamentDto;
     }
 
-    private TournamentEntity setTournamentEntity(TournamentDto tournamentDto,PaymentEntity paymentEntity,PlayGroundEntity playGroundEntity,SportEntity sportEntity) {
+    private TournamentEntity setTournamentEntity(TournamentDto tournamentDto,PaymentEntity paymentEntity,PlayGroundEntity playGroundEntity,SportEntity sportEntity,UserEntity userEntity) {
         TournamentEntity tournamentEntity = new TournamentEntity();
         tournamentEntity.setPaymentEntity(paymentEntity);
         tournamentEntity.setNoOfTeam(tournamentDto.getNoOfTeam());
@@ -205,7 +270,7 @@ public class TournamentServiceImpl implements TournamentService {
         tournamentEntity.setStatus(AppConstance.STATUS_ACTIVE);
         tournamentEntity.setSportEntity(sportEntity);
         tournamentEntity.setId(UUID.randomUUID().toString());
-        tournamentEntity.setCreateBy(jwtTokenProvider.getUser());
+        tournamentEntity.setCreateBy(userEntity.getId());
         tournamentEntity.setCreateDate(new Date());
         tournamentEntity.setNoOfPlayers(tournamentDto.getNoOfPlayers());
         tournamentEntity.setPlayGroundEntity(playGroundEntity);

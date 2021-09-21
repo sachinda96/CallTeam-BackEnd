@@ -30,4 +30,14 @@ public class TournamentController {
         return tournamentService.getTournament(id);
     }
 
+    @GetMapping("/getTournamentsCreateByUser/{id}")
+    public ResponseEntity<?> getTournamentsCreateByUser(@PathVariable String id){
+        return tournamentService.getTournamentsCreateByUser(id);
+    }
+
+    @DeleteMapping("/cancelTournament/{id}")
+    public ResponseEntity<?> cancelTournament(@PathVariable String id){
+        return tournamentService.cancelTouranament(id);
+    }
+
 }

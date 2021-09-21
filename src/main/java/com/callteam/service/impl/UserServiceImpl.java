@@ -46,6 +46,12 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
 
+    /**
+     *
+     * @param userDto
+     * @return Response Entity
+     * Save registration data to the database and return registration status
+     */
     @Override
     public ResponseEntity<?> register(UserDto userDto) {
 
@@ -69,6 +75,12 @@ public class UserServiceImpl implements UserService {
 
     }
 
+    /**
+     *
+     * @param loginDto
+     * @return Response Entity
+     * Authentication flow and login with credentials
+     */
     @Override
     public ResponseEntity<?> login(LoginDto loginDto) {
 
@@ -80,7 +92,7 @@ public class UserServiceImpl implements UserService {
 
                 UserEntity userEntity = userRepository.findByLoginEntityAndStatus(loginEntity,AppConstance.STATUS_ACTIVE);
                 if(loginEntity.getPassword().equalsIgnoreCase(loginDto.getPassword())){
-                        return new ResponseEntity<>(new LoginResponseDto(userEntity.getId(),"toke"),HttpStatus.OK);
+                        return new ResponseEntity<>(new LoginResponseDto(userEntity.getId(), jwtTokenProvider.createToken(userEntity.getEmail())),HttpStatus.OK);
                 }
             }
 
@@ -93,6 +105,13 @@ public class UserServiceImpl implements UserService {
 
     }
 
+    /**
+     *
+     * @param multipartFile
+     * @param userDetailsDto
+     * @return update profile status
+     * Update the profile and save the data to the database
+     */
     @Override
     public ResponseEntity<?> updateProfile(MultipartFile multipartFile, String userDetailsDto) {
 
@@ -147,6 +166,12 @@ public class UserServiceImpl implements UserService {
 
     }
 
+    /**
+     *
+     * @param userDetailsEntity
+     * @param sportEntity
+     * @return UserSportEntity
+     */
     private UserSportEntity setUserSport(UserDetailsEntity userDetailsEntity, SportEntity sportEntity) {
         UserSportEntity userSportEntity = new UserSportEntity();
         userSportEntity.setSportEntity(sportEntity);
@@ -160,6 +185,12 @@ public class UserServiceImpl implements UserService {
 
     }
 
+    /**
+     *
+     * @param id
+     * @return Response Entity
+     * Get profile data from the database using user id and generate the response
+     */
     @Override
     public ResponseEntity<?> getProfile(String id) {
 
@@ -207,6 +238,11 @@ public class UserServiceImpl implements UserService {
 
     }
 
+    /**
+     *
+     * @param userDetailsEntity
+     * @return
+     */
     private List<String> setUserSportList(UserDetailsEntity userDetailsEntity) {
 
         List<UserSportEntity> userSportEntities = userSportRepository.findAllByUserDetailsEntityAndStatus(userDetailsEntity,AppConstance.STATUS_ACTIVE);
@@ -219,13 +255,18 @@ public class UserServiceImpl implements UserService {
         return sportList;
     }
 
+    /**
+     *
+     * @param userDetails
+     * @param userEntity
+     * @return UserDetailsEntity
+     */
     private UserDetailsEntity setUserDetails(UserDetailsDto userDetails,UserEntity userEntity) {
         UserDetailsEntity userDetailsEntity = new UserDetailsEntity();
         userDetailsEntity.setDistrict(userDetails.getDeistic());
         userDetailsEntity.setAboutme(userDetails.getAboutme());
         userDetailsEntity.setSkills(userDetails.getSkills());
         userDetailsEntity.setUserEntity(userEntity);
-        //userDetailsEntity.setCreateBy();
         userDetailsEntity.setAddress(userDetails.getAddress());
         userDetailsEntity.setCity(userDetails.getCity());
         userDetailsEntity.setCreateDate(new Date());
@@ -235,6 +276,12 @@ public class UserServiceImpl implements UserService {
     }
 
 
+    /**
+     *
+     * @param userDetailsEntity
+     * @param userDetails
+     * @return UserDetailsEntity
+     */
     private UserDetailsEntity updateUserDetails(UserDetailsEntity userDetailsEntity,UserDetailsDto userDetails) {
         userDetailsEntity.setDistrict(userDetails.getDeistic());
         userDetailsEntity.setAboutme(userDetails.getAboutme());
@@ -247,6 +294,12 @@ public class UserServiceImpl implements UserService {
         return userDetailsEntity;
     }
 
+    /**
+     *
+     * @param userDto
+     * @param loginEntity
+     * @return UserEntity
+     */
     public UserEntity setUser(UserDto userDto, LoginEntity loginEntity) {
         UserEntity userEntity = new UserEntity();
         userEntity.setId(UUID.randomUUID().toString());
@@ -260,6 +313,11 @@ public class UserServiceImpl implements UserService {
         return userEntity;
     }
 
+    /**
+     *
+     * @param userDto
+     * @return LoginEntity
+     */
     public LoginEntity setLoginDetails(UserDto userDto){
         LoginEntity loginEntity =  new LoginEntity();
         loginEntity.setEmail(userDto.getEmail());
